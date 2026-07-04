@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>¿Pagamos por el producto o por el envase? — TP Diplomatura Ciencia de Datos</title>
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============ DESIGN TOKENS ============ */
+:root{
+  --bruma:#EEF2ED;       /* fondo base, niebla de laboratorio */
+  --bruma-alt:#E4EAE3;
+  --tinta:#1E2A28;       /* texto principal / headers */
+  --tinta-suave:#4B5B57;
+  --salvia:#3C6E5E;      /* acento primario */
+  --salvia-oscuro:#2A4F43;
+  --ambar:#C68A3D;       /* acento secundario, serum gold */
+  --alerta:#A8452F;      /* costo real más caro de lo que parece */
+  --menta:#5B9A80;       /* costo real más barato de lo que parece */
+  --linea:#D3DBD2;
+  --superficie:#FFFFFF;
+  --sombra: 0 12px 30px -12px rgba(30,42,40,.18);
+  --radio: 14px;
+  --serif: 'Fraunces', serif;
+  --sans: 'Inter', sans-serif;
+  --mono: 'IBM Plex Mono', monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:var(--sans);
+  background:var(--bruma);
+  color:var(--tinta);
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--ambar); color:var(--superficie);}
+
+a{color:inherit;}
+
+/* ============ NAV ============ */
+.nav-rail{
+  position:fixed; top:0; left:0; right:0; z-index:100;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 28px;
+  background:rgba(238,242,237,.86);
+  backdrop-filter: blur(10px);
+  border-bottom:1px solid var(--linea);
+}
+.nav-mark{
+  font-family:var(--mono); font-size:.72rem; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--salvia-oscuro); font-weight:600; white-space:nowrap;
+}
+.nav-links{
+  display:flex; gap:2px; overflow-x:auto; scrollbar-width:none;
+}
+.nav-links::-webkit-scrollbar{display:none;}
+.nav-links a{
+  font-family:var(--mono); font-size:.68rem; letter-spacing:.03em;
+  padding:8px 12px; border-radius:20px; white-space:nowrap;
+  color:var(--tinta-suave); text-decoration:none; transition:.25s;
+  border:1px solid transparent;
+}
+.nav-links a .num{color:var(--ambar); margin-right:5px;}
+.nav-links a:hover{background:var(--superficie); border-color:var(--linea);}
+.nav-links a.active{background:var(--tinta); color:var(--bruma); border-color:var(--tinta);}
+.nav-links a.active .num{color:var(--ambar);}
+
+/* ============ SHARED LAYOUT ============ */
+main{padding-top:64px;}
+section{
+  padding:90px 8vw 90px;
+  max-width:1260px; margin:0 auto;
+  position:relative;
+}
+.eyebrow{
+  font-family:var(--mono); font-size:.72rem; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--salvia); font-weight:600; display:flex; align-items:center; gap:10px; margin-bottom:16px;
+}
+.eyebrow .tag-num{
+  font-family:var(--mono); background:var(--tinta); color:var(--bruma);
+  padding:3px 9px; border-radius:4px; font-size:.68rem;
+}
+h2.section-title{
+  font-family:var(--serif); font-weight:500; font-size:clamp(1.9rem,3.2vw,2.7rem);
+  color:var(--tinta); max-width:820px; margin-bottom:14px; letter-spacing:-.01em;
+}
+.section-lede{
+  font-size:1.08rem; color:var(--tinta-suave); max-width:680px; margin-bottom:48px;
+}
+.reveal{opacity:0; transform:translateY(18px); transition:opacity .7s ease, transform .7s ease;}
+.reveal.in{opacity:1; transform:translateY(0);}
+
+/* ============ CARDS ============ */
+.card{
+  background:var(--superficie); border-radius:var(--radio); box-shadow:var(--sombra);
+  border:1px solid var(--linea); padding:32px;
+}
+.card + .card{margin-top:28px;}
+.chart-head{display:flex; justify-content:space-between; align-items:flex-start; gap:20px; flex-wrap:wrap; margin-bottom:6px;}
+.chart-head h3{font-family:var(--serif); font-weight:500; font-size:1.32rem; color:var(--tinta);}
+.chart-desc{color:var(--tinta-suave); font-size:.94rem; max-width:600px; margin-bottom:18px;}
+.toggle-group{display:flex; gap:8px; flex-wrap:wrap;}
+.toggle-btn{
+  font-family:var(--mono); font-size:.72rem; letter-spacing:.02em;
+  padding:8px 14px; border-radius:20px; border:1px solid var(--linea);
+  background:var(--bruma); color:var(--tinta-suave); cursor:pointer; transition:.2s;
+}
+.toggle-btn:hover{border-color:var(--salvia);}
+.toggle-btn.active{background:var(--salvia); border-color:var(--salvia); color:#fff;}
+.plot-box{width:100%; min-height:380px;}
+.insight-strip{
+  margin-top:18px; padding:16px 18px; border-radius:10px; background:var(--bruma);
+  border-left:3px solid var(--ambar); font-size:.92rem; color:var(--tinta);
+}
+.insight-strip b{color:var(--salvia-oscuro);}
+
+/* ============ HERO ============ */
+.hero{
+  min-height:100vh; display:flex; align-items:center; padding-top:64px;
+  position:relative; overflow:hidden;
+}
+.hero-grid{display:grid; grid-template-columns:1.15fr .85fr; gap:60px; align-items:center; width:100%;}
+.hero-kicker{font-family:var(--mono); font-size:.78rem; letter-spacing:.1em; text-transform:uppercase; color:var(--salvia); margin-bottom:22px;}
+.hero h1{
+  font-family:var(--serif); font-weight:500; font-size:clamp(2.4rem,5vw,4.1rem);
+  line-height:1.05; letter-spacing:-.015em; color:var(--tinta);
+}
+.hero h1 em{font-style:italic; color:var(--salvia-oscuro);}
+.hero-sub{margin-top:26px; font-size:1.15rem; color:var(--tinta-suave); max-width:520px;}
+.hero-meta{margin-top:40px; display:flex; gap:36px; flex-wrap:wrap;}
+.hero-meta div{font-family:var(--mono); font-size:.78rem; color:var(--tinta-suave);}
+.hero-meta strong{display:block; font-family:var(--sans); font-size:.95rem; color:var(--tinta); font-weight:600; margin-top:3px;}
+.hero-meta span.lbl{text-transform:uppercase; letter-spacing:.08em; font-size:.68rem;}
+
+/* Signature: price-tag flip */
+.tag-scene{position:relative; height:420px; display:flex; align-items:center; justify-content:center;}
+.jar{position:relative; width:190px; height:230px; margin:0 auto;}
+.jar-body{
+  position:absolute; bottom:0; width:100%; height:190px; border-radius:18px 18px 26px 26px;
+  background:linear-gradient(160deg,#F7F9F6, #DCE6DD 85%); border:1px solid var(--linea);
+  box-shadow: inset 0 -14px 30px rgba(60,110,94,.10), 0 20px 40px -18px rgba(30,42,40,.28);
+}
+.jar-lid{
+  position:absolute; top:0; left:14px; right:14px; height:34px; border-radius:10px;
+  background:linear-gradient(160deg, var(--salvia), var(--salvia-oscuro));
+  box-shadow:0 6px 14px -6px rgba(30,42,40,.4);
+}
+.jar-label{
+  position:absolute; top:70px; left:26px; right:26px; height:70px; border-radius:6px;
+  background:var(--superficie); border:1px dashed var(--linea);
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+}
+.jar-label .brandline{width:60%; height:6px; background:var(--bruma-alt); border-radius:3px;}
+.jar-label .brandline.short{width:36%;}
+.price-tag{
+  position:absolute; top:8px; right:-46px; width:132px;
+  transform:rotate(8deg); transform-origin:top left;
+  animation: tagFlip 5s ease-in-out infinite;
+}
+.price-tag .string{position:absolute; top:-22px; left:18px; width:2px; height:24px; background:var(--tinta-suave);}
+.price-tag .card-face{
+  background:var(--superficie); border:1.5px solid var(--tinta); border-radius:8px 8px 8px 2px;
+  padding:12px 14px; box-shadow:0 14px 26px -12px rgba(30,42,40,.35); position:relative;
+}
+.price-tag .hole{position:absolute; top:6px; left:12px; width:6px; height:6px; border-radius:50%; background:var(--bruma); border:1px solid var(--tinta-suave);}
+.price-tag .face-a, .price-tag .face-b{position:relative;}
+.price-tag .face-b{position:absolute; top:0; left:0; right:0;}
+.price-tag .k{font-family:var(--mono); font-size:.6rem; text-transform:uppercase; letter-spacing:.06em; color:var(--tinta-suave); display:block;}
+.price-tag .v{font-family:var(--mono); font-weight:600; font-size:1.05rem; color:var(--tinta); display:block; margin-top:2px;}
+.price-tag .v.real{color:var(--alerta);}
+.price-tag .face-a{animation: faceAOut 5s ease-in-out infinite;}
+.price-tag .face-b{animation: faceBIn 5s ease-in-out infinite;}
+@keyframes tagFlip{
+  0%,38%{transform:rotate(8deg);}
+  50%{transform:rotate(8deg) rotateY(180deg);}
+  88%{transform:rotate(8deg) rotateY(180deg);}
+  100%{transform:rotate(8deg) rotateY(360deg);}
+}
+@keyframes faceAOut{
+  0%,38%{opacity:1;}
+  42%,88%{opacity:0;}
+  92%,100%{opacity:1;}
+}
+@keyframes faceBIn{
+  0%,38%{opacity:0;}
+  42%,88%{opacity:1;}
+  92%,100%{opacity:0;}
+}
+@media (prefers-reduced-motion: reduce){
+  .price-tag{animation:none;}
+  .price-tag .face-a{animation:none; opacity:1;}
+  .price-tag .face-b{animation:none; opacity:0;}
+}
+
+/* ============ KPI GRID ============ */
+.kpi-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:20px;}
+.kpi-card{
+  background:var(--tinta); color:var(--bruma); border-radius:var(--radio); padding:26px 24px;
+  position:relative; overflow:hidden;
+}
+.kpi-card::after{
+  content:""; position:absolute; right:-30px; top:-30px; width:100px; height:100px; border-radius:50%;
+  background:radial-gradient(circle, rgba(198,138,61,.25), transparent 70%);
+}
+.kpi-card .kpi-icon{font-family:var(--mono); font-size:.68rem; letter-spacing:.08em; text-transform:uppercase; color:var(--ambar);}
+.kpi-card .kpi-val{font-family:var(--serif); font-size:2.1rem; margin:10px 0 4px; font-weight:500;}
+.kpi-card .kpi-sub{font-size:.82rem; color:#B9C4C0;}
+.kpi-card.alt{background:var(--superficie); color:var(--tinta); border:1px solid var(--linea);}
+.kpi-card.alt .kpi-icon{color:var(--salvia);}
+.kpi-card.alt .kpi-sub{color:var(--tinta-suave);}
+
+/* ============ TABLES ============ */
+table.styled{width:100%; border-collapse:collapse; font-size:.92rem;}
+table.styled th{
+  text-align:left; font-family:var(--mono); font-size:.7rem; text-transform:uppercase; letter-spacing:.05em;
+  color:var(--tinta-suave); padding:10px 12px; border-bottom:2px solid var(--tinta);
+}
+table.styled td{padding:12px 12px; border-bottom:1px solid var(--linea);}
+table.styled tr:hover td{background:var(--bruma);}
+.pill{display:inline-block; padding:3px 10px; border-radius:20px; font-family:var(--mono); font-size:.72rem;}
+.pill.up{background:rgba(168,69,47,.12); color:var(--alerta);}
+.pill.down{background:rgba(91,154,128,.14); color:var(--menta);}
+.pill.flat{background:var(--bruma-alt); color:var(--tinta-suave);}
+
+/* ============ METHOD LIST ============ */
+.step-list{display:grid; gap:0; border-top:1px solid var(--linea);}
+.step{display:grid; grid-template-columns:70px 1fr; gap:24px; padding:22px 0; border-bottom:1px solid var(--linea);}
+.step .step-n{font-family:var(--mono); color:var(--ambar); font-weight:600;}
+.step h4{font-family:var(--sans); font-weight:600; margin-bottom:6px;}
+.step p{color:var(--tinta-suave); font-size:.94rem;}
+.col-list{color:var(--tinta-suave); font-size:.94rem; margin-top:6px;}
+.col-list code{font-family:var(--mono); background:var(--bruma-alt); padding:1px 6px; border-radius:4px; color:var(--salvia-oscuro); font-size:.85rem;}
+
+/* ============ ML SECTION ============ */
+.ml-grid{display:grid; grid-template-columns:1fr 1fr; gap:28px;}
+.ml-card h4{font-family:var(--serif); font-weight:500; font-size:1.15rem; margin-bottom:10px; color:var(--salvia-oscuro);}
+.var-chip{display:inline-block; margin:4px 6px 0 0; padding:6px 12px; border-radius:8px; background:var(--bruma); border:1px solid var(--linea); font-family:var(--mono); font-size:.8rem;}
+.flow{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:18px;}
+.flow .node{background:var(--superficie); border:1px solid var(--linea); border-radius:10px; padding:10px 16px; font-family:var(--mono); font-size:.78rem; box-shadow:var(--sombra);}
+.flow .arrow{color:var(--ambar); font-size:1.1rem;}
+
+/* ============ FOOTER / REFERENCES ============ */
+footer{padding:60px 8vw 50px; background:var(--tinta); color:var(--bruma);}
+footer .ref-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:30px; max-width:1260px; margin:0 auto 30px;}
+footer h4{font-family:var(--mono); font-size:.72rem; text-transform:uppercase; letter-spacing:.08em; color:var(--ambar); margin-bottom:10px;}
+footer p, footer li{color:#C7D0CC; font-size:.88rem;}
+footer ul{list-style:none;}
+footer li{margin-bottom:6px;}
+.foot-bottom{max-width:1260px; margin:0 auto; padding-top:24px; border-top:1px solid rgba(255,255,255,.12); font-family:var(--mono); font-size:.72rem; color:#8FA098; display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;}
+
+/* ============ CONCLUSIONS ============ */
+.conclusion-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:22px; margin-bottom:36px;}
+.conc-card{background:var(--superficie); border:1px solid var(--linea); border-radius:var(--radio); padding:24px; box-shadow:var(--sombra);}
+.conc-card .n{font-family:var(--serif); font-size:2rem; color:var(--ambar); margin-bottom:8px;}
+.reco-box{background:var(--salvia); color:#fff; border-radius:var(--radio); padding:30px 34px;}
+.reco-box h4{font-family:var(--serif); font-weight:500; font-size:1.3rem; margin-bottom:12px;}
+.reco-box ul{padding-left:20px;}
+.reco-box li{margin-bottom:8px; opacity:.95;}
+
+@media (max-width:860px){
+  .hero-grid{grid-template-columns:1fr;}
+  .tag-scene{height:280px;}
+  .ml-grid{grid-template-columns:1fr;}
+  .conclusion-grid{grid-template-columns:1fr;}
+  section{padding:70px 6vw;}
+  .nav-mark{display:none;}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav-rail">
+  <span class="nav-mark">TP Diplomatura · Ciencia de Datos e IA</span>
+  <div class="nav-links" id="navLinks">
+    <a href="#portada" data-target="portada"><span class="num">01</span>Portada</a>
+    <a href="#intro" data-target="intro"><span class="num">02</span>Contexto</a>
+    <a href="#metodologia" data-target="metodologia"><span class="num">03</span>Metodología</a>
+    <a href="#eda" data-target="eda"><span class="num">04</span>EDA</a>
+    <a href="#kpis" data-target="kpis"><span class="num">05</span>KPIs</a>
+    <a href="#ml" data-target="ml"><span class="num">06</span>Machine Learning</a>
+    <a href="#conclusiones" data-target="conclusiones"><span class="num">07</span>Conclusiones</a>
+    <a href="#referencias" data-target="referencias"><span class="num">08</span>Referencias</a>
+  </div>
+</nav>
+
+<main>
+
+<!-- ============ 01 PORTADA ============ -->
+<section id="portada" class="hero">
+  <div class="hero-grid">
+    <div>
+      <div class="hero-kicker">Trabajo Final Integrador — Entrega 1</div>
+      <h1>¿Pagamos por el <em>producto</em><br>o por el <em>envase</em>?</h1>
+      <p class="hero-sub">Análisis de precios en el mercado de skincare: ¿Las distintas estrategias de packaging dificultan que el consumidor identifique cuál producto ofrece un mejor valor económico? en 267 productos de 5 países.</p>
+      <div class="hero-meta">
+        <div><span class="lbl">Diplomatura</span><strong>Diplomatura Ciencia de Datos e IA</strong></div>
+        <div><span class="lbl">Estudiante</span><strong>Ana Montagna</strong></div>
+        <div><span class="lbl">Fecha</span><strong>Julio 2026</strong></div>
+      </div>
+    </div>
+    <div class="tag-scene">
+      <div class="jar">
+        <div class="jar-lid"></div>
+        <div class="jar-label">
+          <div class="brandline"></div>
+          <div class="brandline short"></div>
+        </div>
+        <div class="jar-body"></div>
+        <div class="price-tag">
+          <div class="string"></div>
+          <div class="card-face">
+            <div class="hole"></div>
+            <div class="face-a">
+              <span class="k">Precio al público</span>
+              <span class="v">$32.000 ARS</span>
+            </div>
+            <div class="face-b">
+              <span class="k">Costo real</span>
+              <span class="v real">USD 0,09 / ml</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 02 INTRO ============ -->
+<section id="intro" class="reveal">
+  <div class="eyebrow"><span class="tag-num">02</span>Introducción y Contexto</div>
+  <h2 class="section-title">El precio en la etiqueta no cuenta toda la historia</h2>
+  <p class="section-lede">El packaging es una herramienta de marketing tanto como de contención.</p>
+
+  <div class="card">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:36px;">
+      <div>
+        <h4 style="font-family:var(--serif); font-weight:500; color:var(--salvia-oscuro); margin-bottom:10px; font-size:1.1rem;">El problema</h4>
+        <p style="color:var(--tinta-suave); font-size:.96rem;">El precio visible de un producto de belleza puede inducir a error porque no refleja el costo real. Aunque un producto pueda parecer más económico, al considerar la cantidad contenida puede resultar significativamente más caro que otras opciones. El packaging y la cantidad contenida influyen en cómo percibimos el precio, ocultando diferencias importantes en el costo unitario real.
+Las diferentes presentaciones comerciales de los productos cosméticos dificultan comparar objetivamente su precio real.</p>
+      </div>
+      <div>
+        <h4 style="font-family:var(--serif); font-weight:500; color:var(--salvia-oscuro); margin-bottom:10px; font-size:1.1rem;">Hipótesis de trabajo</h4>
+        <p style="color:var(--tinta-suave); font-size:.96rem;">Las diferencias de packaging y volumen dificultan identificar qué producto ofrece la mejor relación precio/cantidad. Las marcas, de manera consciente o no, "esconden" su verdadero costo por unidad detrás de presentaciones pequeñas o de decisiones de pricing que no son directamente comparables entre países ni entre formatos.</p>
+      </div>
+    </div>
+    <div class="insight-strip">¿Por qué importa? Porque comparar por <b>precio de etiqueta</b> es la forma más común (y más engañosa) en que un consumidor decide qué producto comprar. Este trabajo compara ambas miradas —precio total y precio por ml/g— sobre el mismo conjunto de productos.</div>
+  </div>
+</section>
+
+<!-- ============ 03 METODOLOGIA ============ -->
+<section id="metodologia" class="reveal">
+  <div class="eyebrow"><span class="tag-num">03</span>Metodología</div>
+  <h2 class="section-title">De 5 monedas distintas a una sola unidad comparable</h2>
+  <p class="section-lede">Todo el análisis se apoya en un único dataset armado a partir de precios relevados en tiendas online y sitios oficiales de marca en cinco países.</p>
+
+  <div class="card">
+    <h3 style="margin-bottom:14px;">El dataset</h3>
+    <p class="col-list">267 productos de cuidado de la piel, con las siguientes columnas:</p>
+    <p class="col-list" style="margin-top:10px; line-height:2.1;">
+      <code>nombre_producto</code> <code>unidad_medida</code> <code>cantidad</code> <code>precio</code> <code>moneda</code>
+      <code>pais</code> <code>cotizacion_USD</code> <code>Valor_prod_USD</code> <code>USD_x_cant</code> <code>categoria</code>
+    </p>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-bottom:6px;">Proceso de preparación de datos</h3>
+    <div class="step-list">
+      <div class="step">
+        <div class="step-n">01</div>
+        <div><h4>Normalización numérica</h4><p>Los precios venían con coma decimal (formato local) y espacios en los campos monetarios; se convirtieron a punto decimal y a tipo numérico para poder operarlos. Se revisaron valores de precios que no eran coherentes para la actualidad. </p></div>
+      </div>
+      <div class="step">
+        <div class="step-n">02</div>
+        <div><h4>Conversión a moneda común</h4><p>Cada precio local (ARS, BRL, AUD o EUR) se multiplicó por su cotización a USD del día de relevamiento, generando <code>Valor_prod_USD</code> como base comparable entre países.</p></div>
+      </div>
+      <div class="step">
+        <div class="step-n">03</div>
+        <div><h4>Cálculo de costo unitario</h4><p>Se dividió el precio en USD por la cantidad contenida (ml o g) para obtener <code>USD_x_cant</code>: el verdadero costo por unidad de contenido, independiente del tamaño del envase.</p></div>
+      </div>
+      <div class="step">
+        <div class="step-n">04</div>
+        <div><h4>Clasificación por categoría</h4><p>Cada producto se etiquetó en una de cinco categorías funcionales (Cremas, Sérum, Limpiador, Protector solar, Otro/Sin clasificar) y se extrajo la marca desde el nombre del producto para los análisis de ranking.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 04 EDA ============ -->
+<section id="eda" class="reveal">
+  <div class="eyebrow"><span class="tag-num">04</span>Análisis Exploratorio</div>
+  <h2 class="section-title">Tres preguntas para desarmar el precio de etiqueta</h2>
+  <p class="section-lede">Cada pregunta se responde con datos y con un gráfico interactivo, comparando países, categorías y tamaños de envase.</p>
+
+  <!-- Q1 -->
+  <div class="card">
+    <div class="chart-head">
+      <div>
+        <h3>Pregunta 1 — ¿Qué países tienen los precios más altos y más bajos por categoría?</h3>
+        <p class="chart-desc" id="q1desc">Mapa de calor del precio promedio (USD) por categoría y país. Cambiá la vista para comparar en barras agrupadas.</p>
+      </div>
+      <div class="toggle-group">
+        <button class="toggle-btn active" data-q1="heatmap">Mapa de calor</button>
+        <button class="toggle-btn" data-q1="bars">Barras agrupadas</button>
+        <button class="toggle-btn" data-q1="unit">Ver por USD/unidad</button>
+      </div>
+    </div>
+    <div class="plot-box" id="chartQ1"></div>
+    <div class="insight-strip" id="q1insight"></div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="card">
+    <div class="chart-head">
+      <div>
+        <h3>Pregunta 2 — ¿El tamaño del envase se relaciona con el precio por unidad?</h3>
+        <p class="chart-desc">Cada burbuja es un producto: eje X el contenido (ml/g), eje Y el costo real por unidad, tamaño = precio total en USD, color = categoría.</p>
+      </div>
+      <div class="toggle-group">
+        <button class="toggle-btn active" data-q2="all">Todas las categorías</button>
+        <button class="toggle-btn" data-q2="log">Escala logarítmica</button>
+      </div>
+    </div>
+    <div class="plot-box" id="chartQ2" style="min-height:460px;"></div>
+    <div class="insight-strip" id="q2insight"></div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="card">
+    <div class="chart-head">
+      <div>
+        <h3>Pregunta 3 — ¿Qué categorías tienen mayor dispersión y mayor costo unitario?</h3>
+        <p class="chart-desc">Costo promedio por ml/g de cada categoría, con barras de error que muestran cuánto varía ese costo dentro de la categoría.</p>
+      </div>
+    </div>
+    <div class="plot-box" id="chartQ3"></div>
+    <div class="insight-strip" id="q3insight"></div>
+  </div>
+
+  <!-- Brand ranking slope -->
+  <div class="card">
+    <div class="chart-head">
+      <div>
+        <h3>Insight destacado — Ranking de marcas: precio de etiqueta vs. precio real</h3>
+        <p class="chart-desc">Posición de cada marca según precio total promedio (izquierda) vs. según costo real por ml/g (derecha). Una línea que sube significa que la marca es más cara de lo que su precio de etiqueta sugiere; una línea que baja, más barata.</p>
+      </div>
+    </div>
+    <div class="plot-box" id="chartRank" style="min-height:620px;"></div>
+    <div class="insight-strip" id="rankinsight"></div>
+  </div>
+</section>
+
+<!-- ============ 05 KPIS ============ -->
+<section id="kpis" class="reveal">
+  <div class="eyebrow"><span class="tag-num">05</span>Indicadores Clave</div>
+  <h2 class="section-title">Los números detrás del análisis</h2>
+  <p class="section-lede">KPIs calculados sobre los 267 productos del dataset.</p>
+  <div class="kpi-grid" id="kpiGrid"></div>
+</section>
+
+<!-- ============ 06 ML ============ -->
+<section id="ml" class="reveal">
+  <div class="eyebrow"><span class="tag-num">06</span>Propuesta de Machine Learning</div>
+  <h2 class="section-title">Dadas las características de un producto (marca, categoría, cantidad, tipo de envase, ingredientes, origen, etc.), estimar cuál debería ser su precio de mercado.</h2>
+  <p class="section-lede">Un modelo simple de regresión podría anticipar el valor del producto, por unidad/precio sin hacer cálculos.</p>
+
+  <div class="ml-grid">
+    <div class="card ml-card">
+      <h4>Tipo de problema: Regresión</h4>
+      <p style="color:var(--tinta-suave); font-size:.94rem;">El objetivo es predecir <code style="font-family:var(--mono); background:var(--bruma-alt); padding:1px 6px; border-radius:4px;">USD_x_cant</code> (costo por ml o g) a partir de las características observables de un producto, incluso antes de conocer su precio final o cuando el precio no está claramente informado.</p>
+    </div>
+    <div class="card ml-card">
+      <h4>Variables de entrada sugeridas</h4>
+      <span class="var-chip">categoría</span><span class="var-chip">país</span><span class="var-chip">tamaño del envase</span><span class="var-chip">marca</span><span class="var-chip">tipo de producto</span><span class="var-chip">unidad de medida</span>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:28px;">
+    <h4 style="font-family:var(--serif); font-weight:500; font-size:1.15rem; color:var(--salvia-oscuro); margin-bottom:6px;">Flujo conceptual</h4>
+    <div class="flow">
+      <div class="node">Datos del producto<br><span style="color:var(--tinta-suave);">marca · país · tamaño · categoría</span></div>
+      <div class="arrow">→</div>
+      <div class="node">Modelo de regresión<br><span style="color:var(--tinta-suave);">ej. Random Forest / Regresión lineal</span></div>
+      <div class="arrow">→</div>
+      <div class="node">Costo real estimado<br><span style="color:var(--tinta-suave);">USD por ml / g</span></div>
+      <div class="arrow">→</div>
+      <div class="node">Alerta al consumidor<br><span style="color:var(--tinta-suave);">"este precio esconde un sobrecosto"</span></div>
+    </div>
+    <div class="insight-strip">El beneficio directo: ayudar a los consumidores a identificar qué producto ofrece mejor relación precio/cantidad, y detectar si un producto aparece muy por encima del precio esperado, que podría tener un posible sobreprecio.</div>
+  </div>
+</section>
+
+<!-- ============ 07 CONCLUSIONES ============ -->
+<section id="conclusiones" class="reveal">
+  <div class="eyebrow"><span class="tag-num">07</span>Conclusiones</div>
+  <h2 class="section-title">La etiqueta no miente, pero tampoco dice todo</h2>
+  <div class="conclusion-grid">
+    <div class="conc-card">
+      <div class="n">01</div>
+      <p style="font-size:.94rem; color:var(--tinta-suave);">El país y la categoría del producto influyen tanto o más que la marca en el precio final: España y Sérum encabezan ambos extremos de la escala de precios.</p>
+    </div>
+    <div class="conc-card">
+      <div class="n">02</div>
+      <p style="font-size:.94rem; color:var(--tinta-suave);">Existe una relación inversa clara entre tamaño de envase y costo por unidad: los envases chicos cuestan, en promedio, varias veces más por ml que los grandes.</p>
+    </div>
+    <div class="conc-card">
+      <div class="n">03</div>
+      <p style="font-size:.94rem; color:var(--tinta-suave);">El ranking por marca muestra que el precio de etiqueta y el costo real no siempre van de la mano: hay marcas que parecen caras y son buen valor por ml, y otras al revés.</p>
+    </div>
+  </div>
+  <div class="reco-box">
+    <h4>Recomendaciones</h4>
+    <ul>
+      <li>Comparar siempre por costo unitario (USD/ml o USD/g), no por precio de etiqueta, especialmente entre presentaciones de distinto tamaño.</li>
+      <li>Priorizar el análisis por categoría y país al armar estrategias de pricing o de compra, ya que explican más varianza que la marca en sí.</li>
+      <li>Incorporar el modelo de regresión propuesto como una alerta temprana de "sobrecosto por packaging" en plataformas de comparación de precios.</li>
+    </ul>
+  </div>
+</section>
+
+</main>
+
+<footer id="referencias">
+  <div class="eyebrow" style="color:var(--ambar);"><span class="tag-num" style="background:var(--ambar); color:var(--tinta);">08</span>Referencias</div>
+  <div class="ref-grid">
+    <div>
+      <h4>Fuente de datos</h4>
+      <ul>
+        <li>Dataset propio: relevamiento de precios de 267 productos de skincare en Argentina, Brasil, Australia, España y Francia.</li>
+        <li>Cotizaciones de conversión a USD al momento del relevamiento.</li>
+      </ul>
+    </div>
+    <div>
+      <h4>Herramientas</h4>
+      <ul>
+        <li>Python (pandas) para limpieza y análisis exploratorio</li>
+        <li>Plotly.js para las visualizaciones interactivas</li>
+        <li>HTML / CSS / JavaScript para la presentación</li>
+      </ul>
+    </div>
+    <div>
+      <h4>Diplomatura</h4>
+      <ul>
+        <li>Ciencia de Datos e Inteligencia Artificial</li>
+        <li>Trabajo Final Integrador — Entrega 1</li>
+        <li>Julio 2026</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot-bottom">
+    <span>¿Pagamos por el producto o por el envase?</span>
+    <span>TFI · Análisis de precios en skincare</span>
+  </div>
+</footer>
+
+<script>
+const DASHBOARD_DATA = {"records": [{"producto": "Cetaphil Moisturizing Cream", "marca": "Cetaphil", "categoria": "Cremas", "pais": "Argentina", "unidad": "ml", "cantidad": 250, "precio_local": 32000.0, "moneda": "ARS", "precio_usd": 21.66, "usd_unidad": 0.09}, {"producto": "Nivea Creme Hidratante", "marca": "Nivea", "categoria": "Cremas", "pais": "Brasil", "unidad": "ml", "cantidad": 400, "precio_local": 15.9, "moneda": "BRL", "precio_usd": 3.07, "usd_unidad": 0.01}, {"producto": "Neutrogena Hydro Boost Water Gel", "marca": "Neutrogena", "categoria": "Cremas", "pais": "Australia", "unidad": "ml", "cantidad": 50, "precio_local": 22.99, "moneda": "AUD", "precio_usd": 15.86, "usd_unidad": 0.32}, {"producto": "L'Oreal Paris Revitalift Crema Día", "marca": "L'Oréal", "categoria": "Cremas", "pais": "España", "unidad": "ml", "cantidad": 50, "precio_local": 12.5, "moneda": "EUR", "precio_usd": 14.23, "usd_unidad": 0.28}, {"producto": "Simple Kind to Skin Moisturiser", "marca": "Simple", "categoria": "Cremas", "pais": "Australia", "unidad": "ml", "cantidad": 125, "precio_local": 8.99, "moneda": "AUD", "precio_usd": 6.2, "usd_unidad": 0.05}, {"producto": "La Roche-Posay Toleriane Hidratante", "marca": "La Roche-Posay", "categoria": "Cremas", "pais": "Australia", "unidad": "ml", "cantidad": 40, "precio_local": 29.99, "moneda": "AUD", "precio_usd": 20.69, "usd_unidad": 0.52}, {"producto": "Dove Body Lotion Original", "marca": "Dove", "categoria": "Cremas", "pais": "Argentina", "unidad": "ml", "cantidad": 400, "precio_local": 1899.0, "moneda": "ARS", "precio_usd": 1.29, "usd_unidad": 0.0}, {"producto": "Eucerin Aquaphor Crema Reparadora", "marca": "Eucerin", "categoria": "Cremas", "pais": "España", "unidad": "ml", "cantidad": 45, "precio_local": 9.95, "moneda": "EUR", "precio_usd": 11.32, "usd_unidad": 0.25}, {"producto": "Olay Regenerist Micro-Sculpting Cream", "marca": "Olay", "categoria": "Cremas", "pais": "Brasil", "unidad": "g", "cantidad": 50, "precio_local": 269.9, "moneda": "BRL", "precio_usd": 52.17, "usd_unidad": 1.04}, {"producto": "Bioderma Sensibio H2O", "marca": "Bioderma", "categoria": "Limpiador", "pais": "España", "unidad": "ml", "cantidad": 500, "precio_local": 18.5, "moneda": "EUR", "precio_usd": 21.05, "usd_unidad": 0.04}, {"producto": "Garnier Micellar Cleansing Water", "marca": "Garnier", "categoria": "Limpiador", "pais": "Argentina", "unidad": "ml", "cantidad": 400, "precio_local": 4800.0, "moneda": "ARS", "precio_usd": 3.25, "usd_unidad": 0.01}, {"producto": "Vaseline Intensive Care Body Lotion", "marca": "Vaseline", "categoria": "Cremas", "pais": "Australia", "unidad": "ml", "cantidad": 600, "precio_local": 24.99, "moneda": "AUD", "precio_usd": 17.24, "usd_unidad": 0.03}, {"producto": "Avene Eau Thermale Spring Water", "marca": "Avène", "categoria": "Cremas", "pais": "España", "unidad": "ml", "cantidad": 150, "precio_local": 12.99, "moneda": "EUR", "precio_usd": 14.78, "usd_unidad": 0.1}, {"producto": "Soap & Glory Body Butter", "marca": "Soap & Glory", "categoria": "Cremas", "pais": "Australia", "unidad": "ml", "cantidad": 300, "precio_local": 25.5, "moneda": "AUD", "precio_usd": 17.59, "usd_unidad": 0.06}, {"producto": "Eucerin UreaRepair Plus Lotion", "marca": "Eucerin", "categoria": "Cremas", "pais": "España", "unidad": "ml", "cantidad": 250, "precio_local": 14.99, "moneda": "EUR", "precio_usd": 17.06, "usd_unidad": 0.07}, {"producto": "Loreal Hydra Genius Sérum", "marca": "L'Oréal", "categoria": "Sérum", "pais": "Argentina", "unidad": "ml", "cantidad": 70, "precio_local": 2599.0, "moneda": "ARS", "precio_usd": 1.76, "usd_unidad": 0.03}, {"producto": "Clean & Clear Gel de Limpeza", "marca": "Clean & Clear", "categoria": "Limpiador", "pais": "Brasil", "unidad": "ml", "cantidad": 150, "precio_local": 18.9, "moneda": "BRL", "precio_usd": 3.65, "usd_unidad": 0.02}, {"producto": "Avon Renew Clinical Retinol", "marca": "Avon", "categoria": "Sérum", "pais": "Brasil", "unidad": "ml", "cantidad": 30, "precio_local": 89.9, "moneda": "BRL", "precio_usd": 17.38, "usd_unidad": 0.58}, {"producto": "Payot Crème No2", "marca": "Payot", "categoria": "Cremas", "pais": "España", "unidad": "ml", "cantidad": 50, "precio_local": 29.99, "moneda": "EUR", "precio_usd": 34.13, "usd_unidad": 0.68}, {"producto": "Ego QV Moisturising Cream", "marca": "Ego QV", "categoria": "Cremas", "pais": "Australia", "unidad": "g", "cantidad": 500, "precio_local": 18.99, "moneda": "AUD", "precio_usd": 13.1, "usd_unidad": 0.03}, {"producto": "Kiehl's Ultra Facial Cream", "marca": "Kiehl's", "categoria": "Cremas", "pais": "Argentina", "unidad": "ml", "cantidad": 125, "precio_local": 65000.0, "moneda": "ARS", "precio_usd": 44.01, "usd_unidad": 0.35}, {"producto": "Ponds Cold Cream", "marca": "Pond's", "categoria": "Cremas", "pais": "Brasil", "unidad": "g", "cantidad": 200, "precio_local": 49.9, "moneda": "BRL", "precio_usd": 9.65, "usd_unidad": 0.05}, {"producto": "Estee Lauder Advanced Night Repair", "marca": "Estee Lauder", "categoria": "Sérum", "pais": "Australia", "unidad": "ml", "cantidad": 30, "precio_local": 59.99, "moneda": "AUD", "precio_usd": 41.39, "usd_unidad": 1.38}, {"producto": "Clinique Moisture Surge", "marca": "Clinique", "categoria": "Cremas", "pais": "España", "unidad": "ml", "cantidad": 75, "precio_local": 34.5, "moneda": "EUR", "precio_usd": 39.26, "usd_unidad": 0.52}, {"producto": "Aloe Vera Gel Bonne Bell", "marca": "Aloe Vera", "categoria": "Cremas", "pais": "Argentina", "unidad": "ml", "cantidad": 200, "precio_local": 2800.0, "moneda": "ARS", "precio_usd": 1.9, "usd_unidad": 0.01}, {"producto": "Vichy Liftactiv Collagen Specialist", "marca": "Vichy", "categoria": "Cremas", "pais": "España", "unidad": "ml", "cantidad": 50, "precio_local": 25.99, "moneda": "EUR", "precio_usd": 29.58, "usd_unidad": 0.59}, {"producto": "Sukin Facial Moisturiser", "marca": "Sukin", "categoria": "Cremas", "pais": "Australia", "unidad": "ml", "cantidad": 125, "precio_local": 14.99, "moneda": "AUD", "precio_usd": 10.34, "usd_unidad": 0.08}, {"producto": "Darrow Nupill Facial Cream", "marca": "Darrow", "categoria": "Cremas", "pais": "Brasil", "unidad": "g", "cantidad": 40, "precio_local": 79.9, "moneda": "BRL", "precio_usd": 15.44, "usd_unidad": 0.39}, {"producto": "Dove Crema Corporal Original", "marca": "Dove", "categoria": "Cremas", "pais": "Argentina", "unidad": "ml", "cantidad": 250, "precio_local": 3800.0, "moneda": "ARS", "precio_usd": 2.57, "usd_unidad": 0.01}, {"producto": "ROC Retinol Correxion", "marca": "ROC", "categoria": "Sérum", "pais": "España", "unidad": "ml", "cantidad": 30, "precio_local": 14.99, "moneda": "EUR", "precio_usd": 17.06, "usd_unidad": 0.57}, {"producto": "Thursday Plantation Tea Tree Face Wash", "marca": "Thursday Plantation", "categoria": "Limpiador", "pais": "Australia", "unidad": "ml", "cantidad": 200, "precio_local": 12.99, "moneda": "AUD", "precio_usd": 8.96, "usd_unidad": 0.04}, {"producto": "Neutrogena Clean & Clear Gel", "marca": "Neutrogena", "categoria": "Limpiador", "pais": "Brasil", "unidad": "ml", "cantidad": 80, "precio_local": 29.9, "moneda": "BRL", "precio_usd": 5.78, "usd_unidad": 0.07}, {"producto": "Isdin Ureadin Lotion", "marca": "Isdin", "categoria": "Cremas", "pais": "España", "unidad": "ml", "cantidad": 400, "precio_local": 16.5, "moneda": "EUR", "precio_usd": 18.78, "usd_unidad": 0.05}, {"producto": "Fotoprotector ISDIN SPF50+", "marca": "Fotoprotector ISDIN", "categoria": "Protector solar", "pais": "España", "unidad": "ml", "cantidad": 50, "precio_local": 18.0, "moneda": "EUR", "precio_usd": 20.48, "usd_unidad": 0.41}, {"producto": "Banana Boat Sunscreen Lotion", "marca": "Banana Boat", "categoria": "Protector solar", "pais": "Australia", "unidad": "ml", "cantidad": 240, "precio_local": 15.99, "moneda": "AUD", "precio_usd": 11.03, "usd_unidad": 0.05}, {"producto": "L'Bel Hydractiv 360", "marca": "L'Bel", "categoria": "Cremas", "pais": "Argentina", "unidad": "ml", "cantidad": 60, "precio_local": 18000.0, "moneda": "ARS", "precio_usd": 12.19, "usd_unidad": 0.2}, {"producto": "Nívea Protetor Solar FPS50", "marca": "Nivea", "categoria": "Protector solar", "pais": "Brasil", "unidad": "ml", "cantidad": 200, "precio_local": 39.9, "moneda": "BRL", "precio_usd": 7.71, "usd_unidad": 0.04}, {"producto": "Cerave Facial Moisturizing Lotion", "marca": "CeraVe", "categoria": "Cremas", "pais": "Argentina", "unidad": "ml", "cantidad": 52, "precio_local": 21000.0, "moneda": "ARS", "precio_usd": 14.22, "usd_unidad": 0.27}, {"producto": "Bioderma ABCDerm Babysquam", "marca": "Bioderma", "categoria": "Cremas", "pais": "España", "unidad": "g", "cantidad": 40, "precio_local": 8.99, "moneda": "EUR", "precio_usd": 10.23, "usd_unidad": 0.26}, {"producto": "Cancer Council Sunscreen SPF50+", "marca": "Cancer Council", "categoria": "Protector solar", "pais": "Australia", "unidad": "ml", "cantidad": 500, "precio_local": 18.99, "moneda": "AUD", "precio_usd": 13.1, "usd_unidad": 0.03}, {"producto": "Natura Tododia Hidratante Corporal", "marca": "Natura", "categoria": "Cremas", "pais": "Brasil", "unidad": "ml", "cantidad": 200, "precio_local": 34.9, "moneda": "BRL", "precio_usd": 6.75, "usd_unidad": 0.03}, {"producto": "Johnsons Baby Lotion Clasica", "marca": "Johnsons", "categoria": "Cremas", "pais": "Argentina", "unidad": "ml", "cantidad": 200, "precio_local": 4500.0, "moneda": "ARS", "precio_usd": 3.05, "usd_unidad": 0.02}, {"producto": "Hinds Crema Clasica", "marca": "Hinds", "categoria": "Cremas", "pais": "Argentina", "unidad": "ml", "cantidad": 250, "precio_local": 3200.0, "moneda": "ARS", "precio_usd": 2.17, "usd_unidad": 0.01}, {"producto": "Nivea Creme Lata Azul", "marca": "Nivea", "categoria": "Cremas", "pais": "Argentina", "unidad": "ml", "cantidad": 150, "precio_local": 1599.0, "moneda": "ARS", "precio_usd": 1.08, "usd_unidad": 0.01}, {"producto": "Pond's Crema Humectante", "marca": "Pond's", "categoria": "Cremas", "pais": "Argentina", "unidad": "g", "cantidad": 200, "precio_local": 1499.0, "moneda": "ARS", "precio_usd": 1.01, "usd_unidad": 0.01}, {"producto": "St. Ives Crema Corporal Avena", "marca": "St. Ives", "categoria": "Cremas", "pais": "Argentina", "unidad": "ml", "cantidad": 400, "precio_local": 2199.0, "moneda": "ARS", "precio_usd": 1.49, "usd_unidad": 0.0}, {"producto": "Neutrogena Hydro Boost Aqua Gel", "marca": "Neutrogena", "categoria": "Cremas", "pais": "Argentina", "unidad": "ml", "cantidad": 50, "precio_local": 4899.0, "moneda": "ARS", "precio_usd": 3.32, "usd_unidad": 0.07}, {"producto": "La Roche-Posay Effaclar Gel", "marca": "La Roche-Posay", "categoria": "Limpiador", "pais": "Argentina", "unidad": "ml", "cantidad": 200, "precio_local": 48000.0, "moneda": "ARS", "precio_usd": 32.5, "usd_unidad": 0.16}, {"producto": "Bioderma Micellar Solution Argentina", "marca": "Bioderma", "categoria": "Limpiador", "pais": "Argentina", "unidad": "ml", "cantidad": 500, "precio_local": 42000.0, "moneda": "ARS", "precio_usd": 28.43, "usd_unidad": 0.06}, {"producto": "Yanbal Genesis Crema Reafirmante", "marca": "Yanbal", "categoria": "Cremas", "pais": "Argentina", "unidad": "ml", "cantidad": 200, "precio_local": 3800.0, "moneda": "ARS", "precio_usd": 2.57, "usd_unidad": 0.01}, {"producto": "Farmacias Similares Crema Hidratante", "marca": "Farmacias Similares", "categoria": "Cremas", "pais": "Argentina", "unidad": "g", "cantidad": 100, "precio_local": 7500.0, "moneda": "ARS", "precio_usd": 5.08, "usd_unidad": 0.05}, {"producto": "Revlon Age Defying Crema", "marca": "Revlon", "categoria": "Cremas", "pais": "Argentina", "unidad": "ml", "cantidad": 50, "precio_local": 3200.0, "moneda": "ARS", "precio_usd": 2.17, "usd_unidad": 0.04}, {"producto": "Cicatricure Crema Facial Antiage", "marca": "Cicatricure", "categoria": "Cremas", "pais": "Argentina", "unidad": "g", "cantidad": 50, "precio_local": 2799.0, "moneda": "ARS", "precio_usd": 1.89, "usd_unidad": 0.04}, {"producto": "Natura Chronos Hidratante 40+", "marca": "Natura", "categoria": "Cremas", "pais": "Brasil", "unidad": "ml", "cantidad": 40, "precio_local": 89.9, "moneda": "BRL", "precio_usd": 17.38, "usd_unidad": 0.43}, {"producto": "O Boticario Nativa SPA Oleo Corporal", "marca": "O Boticario", "categoria": "Cremas", "pais": "Brasil", "unidad": "ml", "cantidad": 200, "precio_local": 79.9, "moneda": "BRL", "precio_usd": 15.44, "usd_unidad": 0.08}, {"producto": "Vult Gel Hidratante Facial", "marca": "Vult", "categoria": "Cremas", "pais": "Brasil", "unidad": "ml", "cantidad": 30, "precio_local": 29.9, "moneda": "BRL", "precio_usd": 5.78, "usd_unidad": 0.19}, {"producto": "Nívea Hidratante Milk", "marca": "Nivea", "categoria": "Cremas", "pais": "Brasil", "unidad": "ml", "cantidad": 200, "precio_local": 32.9, "moneda": "BRL", "precio_usd": 6.36, "usd_unidad": 0.03}, {"producto": "L'Oreal Paris Revitalift Laser", "marca": "L'Oréal", "categoria": "Sérum", "pais": "Brasil", "unidad": "ml", "cantidad": 50, "precio_local": 159.9, "moneda": "BRL", "precio_usd": 30.91, "usd_unidad": 0.62}, {"producto": "Dermage Lipossolúvel Creme", "marca": "Dermage", "categoria": "Cremas", "pais": "Brasil", "unidad": "g", "cantidad": 60, "precio_local": 129.0, "moneda": "BRL", "precio_usd": 24.94, "usd_unidad": 0.42}, {"producto": "Episol FPS70 Loção Solar", "marca": "Episol", "categoria": "Protector solar", "pais": "Brasil", "unidad": "ml", "cantidad": 120, "precio_local": 64.9, "moneda": "BRL", "precio_usd": 12.55, "usd_unidad": 0.1}, {"producto": "Cetaphil Loção Hidratante", "marca": "Cetaphil", "categoria": "Cremas", "pais": "Brasil", "unidad": "ml", "cantidad": 473, "precio_local": 89.9, "moneda": "BRL", "precio_usd": 17.38, "usd_unidad": 0.04}, {"producto": "Eucerin pH5 Loção Hidratante", "marca": "Eucerin", "categoria": "Cremas", "pais": "Brasil", "unidad": "ml", "cantidad": 250, "precio_local": 69.9, "moneda": "BRL", "precio_usd": 13.51, "usd_unidad": 0.05}, {"producto": "Vichy Aqualia Thermal Creme", "marca": "Vichy", "categoria": "Cremas", "pais": "Brasil", "unidad": "ml", "cantidad": 50, "precio_local": 149.0, "moneda": "BRL", "precio_usd": 28.8, "usd_unidad": 0.58}, {"producto": "Skala Expert Máscara Capilar", "marca": "Skala", "categoria": "Cremas", "pais": "Brasil", "unidad": "g", "cantidad": 500, "precio_local": 12.9, "moneda": "BRL", "precio_usd": 2.49, "usd_unidad": 0.0}, {"producto": "Fotoprotector Minesol FPS60", "marca": "Fotoprotector Minesol", "categoria": "Protector solar", "pais": "Brasil", "unidad": "ml", "cantidad": 120, "precio_local": 49.9, "moneda": "BRL", "precio_usd": 9.65, "usd_unidad": 0.08}, {"producto": "Mercadona Deliplus Crema Hidratante", "marca": "Mercadona Deliplus", "categoria": "Cremas", "pais": "España", "unidad": "ml", "cantidad": 300, "precio_local": 3.95, "moneda": "EUR", "precio_usd": 4.5, "usd_unidad": 0.01}, {"producto": "Sesderma Acglicolic Liposomed Cream", "marca": "Sesderma", "categoria": "Sérum", "pais": "España", "unidad": "ml", "cantidad": 50, "precio_local": 32.0, "moneda": "EUR", "precio_usd": 36.42, "usd_unidad": 0.73}, {"producto": "Uriage Bariéderm Insulating Cream", "marca": "Uriage", "categoria": "Cremas", "pais": "España", "unidad": "ml", "cantidad": 40, "precio_local": 13.9, "moneda": "EUR", "precio_usd": 15.82, "usd_unidad": 0.4}, {"producto": "Martiderm Proteos Mask", "marca": "Martiderm", "categoria": "Sérum", "pais": "España", "unidad": "ml", "cantidad": 30, "precio_local": 25.0, "moneda": "EUR", "precio_usd": 28.45, "usd_unidad": 0.95}, {"producto": "La Roche-Posay Cicaplast Baume B5", "marca": "La Roche-Posay", "categoria": "Cremas", "pais": "España", "unidad": "ml", "cantidad": 40, "precio_local": 13.5, "moneda": "EUR", "precio_usd": 15.36, "usd_unidad": 0.38}, {"producto": "Leti AT4 Crema Atópica", "marca": "Leti", "categoria": "Cremas", "pais": "España", "unidad": "ml", "cantidad": 200, "precio_local": 18.5, "moneda": "EUR", "precio_usd": 21.05, "usd_unidad": 0.11}, {"producto": "Sensilis Upgrade Crema Antiedad", "marca": "Sensilis", "categoria": "Cremas", "pais": "España", "unidad": "ml", "cantidad": 50, "precio_local": 49.95, "moneda": "EUR", "precio_usd": 56.84, "usd_unidad": 1.14}, {"producto": "Nivea Soft Crema Hidratante", "marca": "Nivea", "categoria": "Cremas", "pais": "España", "unidad": "ml", "cantidad": 200, "precio_local": 3.99, "moneda": "EUR", "precio_usd": 4.54, "usd_unidad": 0.02}, {"producto": "Neutrogena Norwegian Formula Crema", "marca": "Neutrogena", "categoria": "Cremas", "pais": "España", "unidad": "ml", "cantidad": 75, "precio_local": 8.99, "moneda": "EUR", "precio_usd": 10.23, "usd_unidad": 0.14}, {"producto": "Weleda Skin Food Crema", "marca": "Weleda", "categoria": "Cremas", "pais": "España", "unidad": "ml", "cantidad": 30, "precio_local": 9.95, "moneda": "EUR", "precio_usd": 11.32, "usd_unidad": 0.38}, {"producto": "SVR Topialyse Crema Barrera", "marca": "SVR", "categoria": "Cremas", "pais": "España", "unidad": "ml", "cantidad": 200, "precio_local": 16.9, "moneda": "EUR", "precio_usd": 19.23, "usd_unidad": 0.1}, {"producto": "Avène Crème Légère Hydratante", "marca": "Avène", "categoria": "Cremas", "pais": "España", "unidad": "ml", "cantidad": 40, "precio_local": 11.9, "moneda": "EUR", "precio_usd": 13.54, "usd_unidad": 0.34}, {"producto": "Germinal 3.0 Acción Inmediata Sérum", "marca": "Germinal", "categoria": "Sérum", "pais": "España", "unidad": "ml", "cantidad": 30, "precio_local": 36.0, "moneda": "EUR", "precio_usd": 40.97, "usd_unidad": 1.37}, {"producto": "Heliocare 360 Gel Oil-Free SPF50", "marca": "Heliocare", "categoria": "Protector solar", "pais": "España", "unidad": "ml", "cantidad": 50, "precio_local": 22.8, "moneda": "EUR", "precio_usd": 25.95, "usd_unidad": 0.52}, {"producto": "Endocare Cellage Firming Cream", "marca": "Endocare", "categoria": "Sérum", "pais": "España", "unidad": "ml", "cantidad": 50, "precio_local": 62.5, "moneda": "EUR", "precio_usd": 71.13, "usd_unidad": 1.42}, {"producto": "Aveeno Daily Moisturising Lotion", "marca": "Aveeno", "categoria": "Cremas", "pais": "Australia", "unidad": "ml", "cantidad": 354, "precio_local": 14.99, "moneda": "AUD", "precio_usd": 10.34, "usd_unidad": 0.03}, {"producto": "Cetaphil Daily Facial Cleanser", "marca": "Cetaphil", "categoria": "Limpiador", "pais": "Australia", "unidad": "ml", "cantidad": 235, "precio_local": 17.99, "moneda": "AUD", "precio_usd": 12.41, "usd_unidad": 0.05}, {"producto": "Neutrogena Rapid Wrinkle Repair Serum", "marca": "Neutrogena", "categoria": "Sérum", "pais": "Australia", "unidad": "ml", "cantidad": 30, "precio_local": 39.99, "moneda": "AUD", "precio_usd": 27.59, "usd_unidad": 0.92}, {"producto": "Priceline Vitamin C Serum", "marca": "Priceline", "categoria": "Sérum", "pais": "Australia", "unidad": "ml", "cantidad": 30, "precio_local": 12.99, "moneda": "AUD", "precio_usd": 8.96, "usd_unidad": 0.3}, {"producto": "La Roche-Posay Anthelios SPF50+", "marca": "La Roche-Posay", "categoria": "Protector solar", "pais": "Australia", "unidad": "ml", "cantidad": 50, "precio_local": 29.99, "moneda": "AUD", "precio_usd": 20.69, "usd_unidad": 0.41}, {"producto": "Biore UV Aqua Rich SPF50 Australia", "marca": "Biore", "categoria": "Protector solar", "pais": "Australia", "unidad": "ml", "cantidad": 50, "precio_local": 19.99, "moneda": "AUD", "precio_usd": 13.79, "usd_unidad": 0.28}, {"producto": "Innisfree Green Tea Seed Serum", "marca": "Innisfree", "categoria": "Sérum", "pais": "Australia", "unidad": "ml", "cantidad": 80, "precio_local": 32.0, "moneda": "AUD", "precio_usd": 22.08, "usd_unidad": 0.28}, {"producto": "The Ordinary Hyaluronic Acid 2pct B5", "marca": "The Ordinary", "categoria": "Sérum", "pais": "Australia", "unidad": "ml", "cantidad": 30, "precio_local": 12.99, "moneda": "AUD", "precio_usd": 8.96, "usd_unidad": 0.3}, {"producto": "Dermaveen Daily Nourish Lotion", "marca": "Dermaveen", "categoria": "Cremas", "pais": "Australia", "unidad": "ml", "cantidad": 500, "precio_local": 18.99, "moneda": "AUD", "precio_usd": 13.1, "usd_unidad": 0.03}, {"producto": "Hamilton Everyday Moisturising Lotion", "marca": "Hamilton", "categoria": "Cremas", "pais": "Australia", "unidad": "ml", "cantidad": 500, "precio_local": 14.99, "moneda": "AUD", "precio_usd": 10.34, "usd_unidad": 0.02}, {"producto": "Nivea Soft Refreshingly Soft Cream AU", "marca": "Nivea", "categoria": "Cremas", "pais": "Australia", "unidad": "ml", "cantidad": 200, "precio_local": 8.99, "moneda": "AUD", "precio_usd": 6.2, "usd_unidad": 0.03}, {"producto": "CeraVe Moisturising Cream Australia", "marca": "CeraVe", "categoria": "Cremas", "pais": "Australia", "unidad": "ml", "cantidad": 340, "precio_local": 29.99, "moneda": "AUD", "precio_usd": 20.69, "usd_unidad": 0.06}, {"producto": "Ultraceuticals Ultra UV SPF50", "marca": "Ultraceuticals", "categoria": "Protector solar", "pais": "Australia", "unidad": "ml", "cantidad": 50, "precio_local": 65.0, "moneda": "AUD", "precio_usd": 44.84, "usd_unidad": 0.9}, {"producto": "Bioderma Sensibio Micellar Water AU", "marca": "Bioderma", "categoria": "Limpiador", "pais": "Australia", "unidad": "ml", "cantidad": 500, "precio_local": 24.99, "moneda": "AUD", "precio_usd": 17.24, "usd_unidad": 0.03}, {"producto": "Nivea Creme Boite Bleue", "marca": "Nivea", "categoria": "Cremas", "pais": "Francia", "unidad": "ml", "cantidad": 150, "precio_local": 5.99, "moneda": "EUR", "precio_usd": 6.82, "usd_unidad": 0.05}, {"producto": "Nivea Body Lotion Karite", "marca": "Nivea", "categoria": "Cremas", "pais": "Francia", "unidad": "ml", "cantidad": 400, "precio_local": 6.49, "moneda": "EUR", "precio_usd": 7.39, "usd_unidad": 0.02}, {"producto": "L'Oreal Paris Revitalift Crème de Jour", "marca": "L'Oréal", "categoria": "Cremas", "pais": "Francia", "unidad": "ml", "cantidad": 50, "precio_local": 14.9, "moneda": "EUR", "precio_usd": 16.96, "usd_unidad": 0.34}, {"producto": "L'Oreal Paris Hydra Genius Gel", "marca": "L'Oréal", "categoria": "Sérum", "pais": "Francia", "unidad": "ml", "cantidad": 70, "precio_local": 16.9, "moneda": "EUR", "precio_usd": 19.23, "usd_unidad": 0.27}, {"producto": "Garnier Eau Micellaire Tout-en-1", "marca": "Garnier", "categoria": "Limpiador", "pais": "Francia", "unidad": "ml", "cantidad": 400, "precio_local": 5.99, "moneda": "EUR", "precio_usd": 6.82, "usd_unidad": 0.02}, {"producto": "Garnier Skin Active Crème Hydratante", "marca": "Garnier", "categoria": "Cremas", "pais": "Francia", "unidad": "ml", "cantidad": 50, "precio_local": 8.9, "moneda": "EUR", "precio_usd": 10.13, "usd_unidad": 0.2}, {"producto": "Bioderma Sensibio H2O Micellaire", "marca": "Bioderma", "categoria": "Limpiador", "pais": "Francia", "unidad": "ml", "cantidad": 500, "precio_local": 14.9, "moneda": "EUR", "precio_usd": 16.96, "usd_unidad": 0.03}, {"producto": "Bioderma Atoderm Crème Corps", "marca": "Bioderma", "categoria": "Cremas", "pais": "Francia", "unidad": "ml", "cantidad": 200, "precio_local": 12.5, "moneda": "EUR", "precio_usd": 14.23, "usd_unidad": 0.07}, {"producto": "Vichy Normaderm Phytosolution Crème", "marca": "Vichy", "categoria": "Cremas", "pais": "Francia", "unidad": "ml", "cantidad": 50, "precio_local": 16.9, "moneda": "EUR", "precio_usd": 19.23, "usd_unidad": 0.38}, {"producto": "Vichy Mineral 89 Sérum Booster", "marca": "Vichy", "categoria": "Sérum", "pais": "Francia", "unidad": "ml", "cantidad": 50, "precio_local": 19.9, "moneda": "EUR", "precio_usd": 22.65, "usd_unidad": 0.45}, {"producto": "La Roche-Posay Toleriane Fluide", "marca": "La Roche-Posay", "categoria": "Cremas", "pais": "Francia", "unidad": "ml", "cantidad": 40, "precio_local": 13.5, "moneda": "EUR", "precio_usd": 15.36, "usd_unidad": 0.38}, {"producto": "La Roche-Posay Anthelios SPF50+ Fluide", "marca": "La Roche-Posay", "categoria": "Protector solar", "pais": "Francia", "unidad": "ml", "cantidad": 50, "precio_local": 20.5, "moneda": "EUR", "precio_usd": 23.33, "usd_unidad": 0.47}, {"producto": "Avène Crème Légère Apaisante", "marca": "Avène", "categoria": "Cremas", "pais": "Francia", "unidad": "ml", "cantidad": 40, "precio_local": 11.9, "moneda": "EUR", "precio_usd": 13.54, "usd_unidad": 0.34}, {"producto": "Avène Eau Thermale Spray", "marca": "Avène", "categoria": "Cremas", "pais": "Francia", "unidad": "ml", "cantidad": 150, "precio_local": 8.5, "moneda": "EUR", "precio_usd": 9.67, "usd_unidad": 0.06}, {"producto": "Neutrogena Hydro Boost Gel-Crème", "marca": "Neutrogena", "categoria": "Cremas", "pais": "Francia", "unidad": "ml", "cantidad": 50, "precio_local": 13.99, "moneda": "EUR", "precio_usd": 15.92, "usd_unidad": 0.32}, {"producto": "Neutrogena Norwegian Formula Crème Mains", "marca": "Neutrogena", "categoria": "Cremas", "pais": "Francia", "unidad": "ml", "cantidad": 75, "precio_local": 6.99, "moneda": "EUR", "precio_usd": 7.95, "usd_unidad": 0.11}, {"producto": "Dove Lotion Corporelle Hydratation Intense", "marca": "Dove", "categoria": "Cremas", "pais": "Francia", "unidad": "ml", "cantidad": 400, "precio_local": 5.49, "moneda": "EUR", "precio_usd": 6.25, "usd_unidad": 0.02}, {"producto": "Cetaphil Crème Hydratante Visage Corps", "marca": "Cetaphil", "categoria": "Cremas", "pais": "Francia", "unidad": "ml", "cantidad": 250, "precio_local": 12.9, "moneda": "EUR", "precio_usd": 14.68, "usd_unidad": 0.06}, {"producto": "Eucerin pH5 Lotion Hydratante", "marca": "Eucerin", "categoria": "Cremas", "pais": "Francia", "unidad": "ml", "cantidad": 250, "precio_local": 9.99, "moneda": "EUR", "precio_usd": 11.37, "usd_unidad": 0.05}, {"producto": "Eucerin Aquaphor Soin Réparateur", "marca": "Eucerin", "categoria": "Cremas", "pais": "Francia", "unidad": "ml", "cantidad": 45, "precio_local": 10.5, "moneda": "EUR", "precio_usd": 11.95, "usd_unidad": 0.27}, {"producto": "Weleda Skin Food Crème Nourrissante", "marca": "Weleda", "categoria": "Cremas", "pais": "Francia", "unidad": "ml", "cantidad": 30, "precio_local": 7.9, "moneda": "EUR", "precio_usd": 8.99, "usd_unidad": 0.3}, {"producto": "Payot Crème No.2 Cachemire", "marca": "Payot", "categoria": "Cremas", "pais": "Francia", "unidad": "ml", "cantidad": 50, "precio_local": 35.0, "moneda": "EUR", "precio_usd": 39.83, "usd_unidad": 0.8}, {"producto": "Clinique Moisture Surge 100H", "marca": "Clinique", "categoria": "Cremas", "pais": "Francia", "unidad": "ml", "cantidad": 75, "precio_local": 39.0, "moneda": "EUR", "precio_usd": 44.38, "usd_unidad": 0.59}, {"producto": "The Ordinary Hyaluronic Acid 2pct B5 FR", "marca": "The Ordinary", "categoria": "Sérum", "pais": "Francia", "unidad": "ml", "cantidad": 30, "precio_local": 8.9, "moneda": "EUR", "precio_usd": 10.13, "usd_unidad": 0.34}, {"producto": "Uriage Eau Thermale Crème Légère", "marca": "Uriage", "categoria": "Cremas", "pais": "Francia", "unidad": "ml", "cantidad": 40, "precio_local": 12.5, "moneda": "EUR", "precio_usd": 14.23, "usd_unidad": 0.36}, {"producto": "L'Oreal Paris Revitalift Crema Dia AR", "marca": "L'Oréal", "categoria": "Cremas", "pais": "Argentina", "unidad": "ml", "cantidad": 50, "precio_local": 3499.0, "moneda": "ARS", "precio_usd": 2.37, "usd_unidad": 0.05}, {"producto": "Garnier Skin Active Agua Micelar AR", "marca": "Garnier", "categoria": "Limpiador", "pais": "Argentina", "unidad": "ml", "cantidad": 400, "precio_local": 1850.0, "moneda": "ARS", "precio_usd": 1.25, "usd_unidad": 0.0}, {"producto": "Bioderma Atoderm Crema Corporal", "marca": "Bioderma", "categoria": "Cremas", "pais": "Argentina", "unidad": "ml", "cantidad": 200, "precio_local": 38000.0, "moneda": "ARS", "precio_usd": 25.73, "usd_unidad": 0.13}, {"producto": "Vichy Mineral 89 Serum 50ml", "marca": "Vichy", "categoria": "Sérum", "pais": "Argentina", "unidad": "ml", "cantidad": 50, "precio_local": 55000.0, "moneda": "ARS", "precio_usd": 37.24, "usd_unidad": 0.74}, {"producto": "La Roche-Posay Anthelios SPF50+ Fluido 50ml", "marca": "La Roche-Posay", "categoria": "Protector solar", "pais": "Argentina", "unidad": "ml", "cantidad": 50, "precio_local": 58000.0, "moneda": "ARS", "precio_usd": 39.27, "usd_unidad": 0.79}, {"producto": "Eucerin pH5 Locion Hidratante AR", "marca": "Eucerin", "categoria": "Cremas", "pais": "Argentina", "unidad": "ml", "cantidad": 250, "precio_local": 3800.0, "moneda": "ARS", "precio_usd": 2.57, "usd_unidad": 0.01}, {"producto": "Neutrogena Norwegian Formula Crema Manos", "marca": "Neutrogena", "categoria": "Cremas", "pais": "Argentina", "unidad": "ml", "cantidad": 75, "precio_local": 1250.0, "moneda": "ARS", "precio_usd": 0.85, "usd_unidad": 0.01}, {"producto": "Dove Locion Corporal Hidratacion AR", "marca": "Dove", "categoria": "Cremas", "pais": "Argentina", "unidad": "ml", "cantidad": 400, "precio_local": 1899.0, "moneda": "ARS", "precio_usd": 1.29, "usd_unidad": 0.0}, {"producto": "The Ordinary Hialuronico 2pct B5 AR", "marca": "The Ordinary", "categoria": "Sérum", "pais": "Argentina", "unidad": "ml", "cantidad": 30, "precio_local": 1890.0, "moneda": "ARS", "precio_usd": 1.28, "usd_unidad": 0.04}, {"producto": "Weleda Skin Food Crema Nutritiva AR", "marca": "Weleda", "categoria": "Cremas", "pais": "Argentina", "unidad": "ml", "cantidad": 30, "precio_local": 2800.0, "moneda": "ARS", "precio_usd": 1.9, "usd_unidad": 0.06}, {"producto": "Clinique Moisture Surge 100H AR", "marca": "Clinique", "categoria": "Cremas", "pais": "Argentina", "unidad": "ml", "cantidad": 75, "precio_local": 95000.0, "moneda": "ARS", "precio_usd": 64.32, "usd_unidad": 0.86}, {"producto": "Payot Creme No2 Cachemire AR", "marca": "Payot", "categoria": "Otro / Sin clasificar", "pais": "Argentina", "unidad": "ml", "cantidad": 50, "precio_local": 85000.0, "moneda": "ARS", "precio_usd": 57.55, "usd_unidad": 1.15}, {"producto": "Olay Total Effects 7en1 Crema Dia", "marca": "Olay", "categoria": "Cremas", "pais": "Argentina", "unidad": "g", "cantidad": 50, "precio_local": 3200.0, "moneda": "ARS", "precio_usd": 2.17, "usd_unidad": 0.04}, {"producto": "Avene Crema Ligera Calmante AR", "marca": "Avène", "categoria": "Cremas", "pais": "Argentina", "unidad": "ml", "cantidad": 40, "precio_local": 4200.0, "moneda": "ARS", "precio_usd": 2.84, "usd_unidad": 0.07}, {"producto": "Nivea Creme Lata Azul BR", "marca": "Nivea", "categoria": "Cremas", "pais": "Brasil", "unidad": "ml", "cantidad": 150, "precio_local": 22.9, "moneda": "BRL", "precio_usd": 4.43, "usd_unidad": 0.03}, {"producto": "L'Oreal Paris Revitalift Gel-Creme BR", "marca": "L'Oréal", "categoria": "Cremas", "pais": "Brasil", "unidad": "ml", "cantidad": 50, "precio_local": 119.9, "moneda": "BRL", "precio_usd": 23.18, "usd_unidad": 0.46}, {"producto": "Garnier Micellar Water BR", "marca": "Garnier", "categoria": "Limpiador", "pais": "Brasil", "unidad": "ml", "cantidad": 400, "precio_local": 34.9, "moneda": "BRL", "precio_usd": 6.75, "usd_unidad": 0.02}, {"producto": "Bioderma Sensibio H2O BR", "marca": "Bioderma", "categoria": "Limpiador", "pais": "Brasil", "unidad": "ml", "cantidad": 500, "precio_local": 89.9, "moneda": "BRL", "precio_usd": 17.38, "usd_unidad": 0.03}, {"producto": "Vichy Mineral 89 Serum BR", "marca": "Vichy", "categoria": "Sérum", "pais": "Brasil", "unidad": "ml", "cantidad": 50, "precio_local": 159.9, "moneda": "BRL", "precio_usd": 30.91, "usd_unidad": 0.62}, {"producto": "La Roche-Posay Anthelios XL SPF70", "marca": "La Roche-Posay", "categoria": "Protector solar", "pais": "Brasil", "unidad": "ml", "cantidad": 120, "precio_local": 99.9, "moneda": "BRL", "precio_usd": 19.31, "usd_unidad": 0.16}, {"producto": "Eucerin Urea Repair Plus Locao", "marca": "Eucerin", "categoria": "Otro / Sin clasificar", "pais": "Brasil", "unidad": "ml", "cantidad": 250, "precio_local": 79.9, "moneda": "BRL", "precio_usd": 15.44, "usd_unidad": 0.06}, {"producto": "Neutrogena Hydro Boost Gel de Agua", "marca": "Neutrogena", "categoria": "Cremas", "pais": "Brasil", "unidad": "ml", "cantidad": 50, "precio_local": 84.9, "moneda": "BRL", "precio_usd": 16.41, "usd_unidad": 0.33}, {"producto": "Dove Hidratante Corporal Amendoas", "marca": "Dove", "categoria": "Cremas", "pais": "Brasil", "unidad": "ml", "cantidad": 400, "precio_local": 29.9, "moneda": "BRL", "precio_usd": 5.78, "usd_unidad": 0.01}, {"producto": "Cetaphil Locao Hidratante Diaria", "marca": "Cetaphil", "categoria": "Cremas", "pais": "Brasil", "unidad": "ml", "cantidad": 250, "precio_local": 64.9, "moneda": "BRL", "precio_usd": 12.55, "usd_unidad": 0.05}, {"producto": "The Ordinary Acido Hialuronico 2pct BR", "marca": "The Ordinary", "categoria": "Sérum", "pais": "Brasil", "unidad": "ml", "cantidad": 30, "precio_local": 45.9, "moneda": "BRL", "precio_usd": 8.87, "usd_unidad": 0.3}, {"producto": "Olay Total Effects 7 em 1 BR", "marca": "Olay", "categoria": "Otro / Sin clasificar", "pais": "Brasil", "unidad": "g", "cantidad": 50, "precio_local": 129.9, "moneda": "BRL", "precio_usd": 25.11, "usd_unidad": 0.5}, {"producto": "Payot Creme No.2 BR", "marca": "Payot", "categoria": "Otro / Sin clasificar", "pais": "Brasil", "unidad": "ml", "cantidad": 50, "precio_local": 199.0, "moneda": "BRL", "precio_usd": 38.47, "usd_unidad": 0.77}, {"producto": "Weleda Skin Food Creme Nutritivo BR", "marca": "Weleda", "categoria": "Cremas", "pais": "Brasil", "unidad": "ml", "cantidad": 30, "precio_local": 89.9, "moneda": "BRL", "precio_usd": 17.38, "usd_unidad": 0.58}, {"producto": "Avene Creme Legere Apaisante BR", "marca": "Avène", "categoria": "Otro / Sin clasificar", "pais": "Brasil", "unidad": "ml", "cantidad": 40, "precio_local": 89.9, "moneda": "BRL", "precio_usd": 17.38, "usd_unidad": 0.43}, {"producto": "Nivea Creme Lata Azul ES", "marca": "Nivea", "categoria": "Cremas", "pais": "España", "unidad": "ml", "cantidad": 150, "precio_local": 5.49, "moneda": "EUR", "precio_usd": 6.25, "usd_unidad": 0.04}, {"producto": "L'Oreal Paris Revitalift Anti-Arrugas", "marca": "L'Oréal", "categoria": "Otro / Sin clasificar", "pais": "España", "unidad": "ml", "cantidad": 50, "precio_local": 13.99, "moneda": "EUR", "precio_usd": 15.92, "usd_unidad": 0.32}, {"producto": "Garnier Skin Active Agua Micelar 3en1", "marca": "Garnier", "categoria": "Limpiador", "pais": "España", "unidad": "ml", "cantidad": 400, "precio_local": 6.99, "moneda": "EUR", "precio_usd": 7.95, "usd_unidad": 0.02}, {"producto": "Vichy Mineral 89 Serum Hidratante", "marca": "Vichy", "categoria": "Sérum", "pais": "España", "unidad": "ml", "cantidad": 50, "precio_local": 19.9, "moneda": "EUR", "precio_usd": 22.65, "usd_unidad": 0.45}, {"producto": "Eucerin pH5 Locion Hidratante ES", "marca": "Eucerin", "categoria": "Cremas", "pais": "España", "unidad": "ml", "cantidad": 250, "precio_local": 10.99, "moneda": "EUR", "precio_usd": 12.51, "usd_unidad": 0.05}, {"producto": "Neutrogena Hydro Boost Gel-Crema ES", "marca": "Neutrogena", "categoria": "Cremas", "pais": "España", "unidad": "ml", "cantidad": 50, "precio_local": 13.99, "moneda": "EUR", "precio_usd": 15.92, "usd_unidad": 0.32}, {"producto": "Dove Locion Corporal Nutricion Intensa", "marca": "Dove", "categoria": "Cremas", "pais": "España", "unidad": "ml", "cantidad": 400, "precio_local": 5.49, "moneda": "EUR", "precio_usd": 6.25, "usd_unidad": 0.02}, {"producto": "Cetaphil Crema Hidratante ES", "marca": "Cetaphil", "categoria": "Cremas", "pais": "España", "unidad": "ml", "cantidad": 250, "precio_local": 12.9, "moneda": "EUR", "precio_usd": 14.68, "usd_unidad": 0.06}, {"producto": "The Ordinary Hialuronico 2pct B5 ES", "marca": "The Ordinary", "categoria": "Sérum", "pais": "España", "unidad": "ml", "cantidad": 30, "precio_local": 9.5, "moneda": "EUR", "precio_usd": 10.81, "usd_unidad": 0.36}, {"producto": "Olay Total Effects 7 en 1 Crema Dia", "marca": "Olay", "categoria": "Cremas", "pais": "España", "unidad": "g", "cantidad": 50, "precio_local": 14.99, "moneda": "EUR", "precio_usd": 17.06, "usd_unidad": 0.34}, {"producto": "Weleda Skin Food Crema Nutritiva ES", "marca": "Weleda", "categoria": "Cremas", "pais": "España", "unidad": "ml", "cantidad": 30, "precio_local": 9.95, "moneda": "EUR", "precio_usd": 11.32, "usd_unidad": 0.38}, {"producto": "Clinique Moisture Surge 100H ES", "marca": "Clinique", "categoria": "Cremas", "pais": "España", "unidad": "ml", "cantidad": 75, "precio_local": 39.9, "moneda": "EUR", "precio_usd": 45.41, "usd_unidad": 0.61}, {"producto": "Bioderma Atoderm Creme Corps ES", "marca": "Bioderma", "categoria": "Otro / Sin clasificar", "pais": "España", "unidad": "ml", "cantidad": 200, "precio_local": 13.5, "moneda": "EUR", "precio_usd": 15.36, "usd_unidad": 0.08}, {"producto": "Nivea Creme Moisturising Cream AU", "marca": "Nivea", "categoria": "Cremas", "pais": "Australia", "unidad": "ml", "cantidad": 150, "precio_local": 8.99, "moneda": "AUD", "precio_usd": 6.2, "usd_unidad": 0.04}, {"producto": "L'Oreal Paris Revitalift Day Cream AU", "marca": "L'Oréal", "categoria": "Cremas", "pais": "Australia", "unidad": "ml", "cantidad": 50, "precio_local": 24.99, "moneda": "AUD", "precio_usd": 17.24, "usd_unidad": 0.34}, {"producto": "Garnier Micellar Cleansing Water AU", "marca": "Garnier", "categoria": "Limpiador", "pais": "Australia", "unidad": "ml", "cantidad": 400, "precio_local": 10.99, "moneda": "AUD", "precio_usd": 7.58, "usd_unidad": 0.02}, {"producto": "Bioderma Sensibio H2O AU", "marca": "Bioderma", "categoria": "Limpiador", "pais": "Australia", "unidad": "ml", "cantidad": 500, "precio_local": 29.99, "moneda": "AUD", "precio_usd": 20.69, "usd_unidad": 0.04}, {"producto": "Vichy Mineral 89 Serum AU", "marca": "Vichy", "categoria": "Sérum", "pais": "Australia", "unidad": "ml", "cantidad": 50, "precio_local": 44.99, "moneda": "AUD", "precio_usd": 31.04, "usd_unidad": 0.62}, {"producto": "Eucerin pH5 Moisturising Lotion AU", "marca": "Eucerin", "categoria": "Cremas", "pais": "Australia", "unidad": "ml", "cantidad": 250, "precio_local": 24.99, "moneda": "AUD", "precio_usd": 17.24, "usd_unidad": 0.07}, {"producto": "Dove Body Lotion Intensive Nourishment AU", "marca": "Dove", "categoria": "Cremas", "pais": "Australia", "unidad": "ml", "cantidad": 400, "precio_local": 10.0, "moneda": "AUD", "precio_usd": 6.9, "usd_unidad": 0.02}, {"producto": "Cetaphil Moisturising Lotion AU", "marca": "Cetaphil", "categoria": "Cremas", "pais": "Australia", "unidad": "ml", "cantidad": 250, "precio_local": 19.99, "moneda": "AUD", "precio_usd": 13.79, "usd_unidad": 0.06}, {"producto": "The Ordinary Hyaluronic Acid 2pct B5 AU", "marca": "The Ordinary", "categoria": "Sérum", "pais": "Australia", "unidad": "ml", "cantidad": 30, "precio_local": 14.99, "moneda": "AUD", "precio_usd": 10.34, "usd_unidad": 0.34}, {"producto": "Olay Total Effects 7-in-1 Day Cream AU", "marca": "Olay", "categoria": "Cremas", "pais": "Australia", "unidad": "g", "cantidad": 50, "precio_local": 29.99, "moneda": "AUD", "precio_usd": 20.69, "usd_unidad": 0.41}, {"producto": "Clinique Moisture Surge 100H AU", "marca": "Clinique", "categoria": "Cremas", "pais": "Australia", "unidad": "ml", "cantidad": 75, "precio_local": 64.0, "moneda": "AUD", "precio_usd": 44.15, "usd_unidad": 0.59}, {"producto": "Weleda Skin Food Original AU", "marca": "Weleda", "categoria": "Cremas", "pais": "Australia", "unidad": "ml", "cantidad": 30, "precio_local": 16.99, "moneda": "AUD", "precio_usd": 11.72, "usd_unidad": 0.39}, {"producto": "Avene Soothing Light Cream AU", "marca": "Avène", "categoria": "Cremas", "pais": "Australia", "unidad": "ml", "cantidad": 40, "precio_local": 29.99, "moneda": "AUD", "precio_usd": 20.69, "usd_unidad": 0.52}, {"producto": "Neutrogena Hydro Boost Water Cream AU", "marca": "Neutrogena", "categoria": "Cremas", "pais": "Australia", "unidad": "ml", "cantidad": 50, "precio_local": 24.99, "moneda": "AUD", "precio_usd": 17.24, "usd_unidad": 0.34}, {"producto": "Avene Thermal Spring Water Spray AU", "marca": "Avène", "categoria": "Cremas", "pais": "Australia", "unidad": "ml", "cantidad": 150, "precio_local": 14.99, "moneda": "AUD", "precio_usd": 10.34, "usd_unidad": 0.07}, {"producto": "Avène Crème Légère Apaisante 40ml FR", "marca": "Avène", "categoria": "Cremas", "pais": "Francia", "unidad": "ml", "cantidad": 40, "precio_local": 9.9, "moneda": "EUR", "precio_usd": 11.27, "usd_unidad": 0.28}, {"producto": "Avène Crème Légère Apaisante 150ml FR", "marca": "Avène", "categoria": "Cremas", "pais": "Francia", "unidad": "ml", "cantidad": 150, "precio_local": 18.5, "moneda": "EUR", "precio_usd": 21.05, "usd_unidad": 0.14}, {"producto": "Avène Crème Légère Apaisante 40ml ES", "marca": "Avène", "categoria": "Cremas", "pais": "España", "unidad": "ml", "cantidad": 40, "precio_local": 11.9, "moneda": "EUR", "precio_usd": 13.54, "usd_unidad": 0.34}, {"producto": "Avène Crema Ligera Calmante 150ml AR", "marca": "Avène", "categoria": "Cremas", "pais": "Argentina", "unidad": "ml", "cantidad": 150, "precio_local": 22000.0, "moneda": "ARS", "precio_usd": 14.89, "usd_unidad": 0.1}, {"producto": "Avène Crema Ligera Calmante 150ml BR", "marca": "Avène", "categoria": "Cremas", "pais": "Brasil", "unidad": "ml", "cantidad": 150, "precio_local": 129.9, "moneda": "BRL", "precio_usd": 25.11, "usd_unidad": 0.17}, {"producto": "Avène Thermal Spring Water Spray 150ml AR", "marca": "Avène", "categoria": "Cremas", "pais": "Argentina", "unidad": "ml", "cantidad": 150, "precio_local": 15000.0, "moneda": "ARS", "precio_usd": 10.16, "usd_unidad": 0.07}, {"producto": "Avène Thermal Spring Water Spray 150ml BR", "marca": "Avène", "categoria": "Cremas", "pais": "Brasil", "unidad": "ml", "cantidad": 150, "precio_local": 69.9, "moneda": "BRL", "precio_usd": 13.51, "usd_unidad": 0.09}, {"producto": "Avène Eau Thermale Spray 150ml ES", "marca": "Avène", "categoria": "Cremas", "pais": "España", "unidad": "ml", "cantidad": 150, "precio_local": 12.99, "moneda": "EUR", "precio_usd": 14.78, "usd_unidad": 0.1}, {"producto": "Olay Total Effects 7-en-1 Crème Jour FR", "marca": "Olay", "categoria": "Cremas", "pais": "Francia", "unidad": "g", "cantidad": 50, "precio_local": 19.9, "moneda": "EUR", "precio_usd": 22.65, "usd_unidad": 0.45}, {"producto": "Olay Regenerist Micro-Sculpting Cream AR", "marca": "Olay", "categoria": "Cremas", "pais": "Argentina", "unidad": "g", "cantidad": 50, "precio_local": 38000.0, "moneda": "ARS", "precio_usd": 25.73, "usd_unidad": 0.51}, {"producto": "Olay Regenerist Micro-Sculpting Cream AU", "marca": "Olay", "categoria": "Cremas", "pais": "Australia", "unidad": "g", "cantidad": 50, "precio_local": 34.99, "moneda": "AUD", "precio_usd": 24.14, "usd_unidad": 0.48}, {"producto": "Olay Regenerist Micro-Sculpting Cream ES", "marca": "Olay", "categoria": "Cremas", "pais": "España", "unidad": "g", "cantidad": 50, "precio_local": 18.99, "moneda": "EUR", "precio_usd": 21.61, "usd_unidad": 0.43}, {"producto": "Olay Regenerist Micro-Sculpting Crème FR", "marca": "Olay", "categoria": "Cremas", "pais": "Francia", "unidad": "g", "cantidad": 50, "precio_local": 19.9, "moneda": "EUR", "precio_usd": 22.65, "usd_unidad": 0.45}, {"producto": "Clinique Moisture Surge 100H 75ml BR", "marca": "Clinique", "categoria": "Cremas", "pais": "Brasil", "unidad": "ml", "cantidad": 75, "precio_local": 249.0, "moneda": "BRL", "precio_usd": 48.13, "usd_unidad": 0.64}, {"producto": "Payot Crème No.2 Cachemire 50ml AU", "marca": "Payot", "categoria": "Cremas", "pais": "Australia", "unidad": "ml", "cantidad": 50, "precio_local": 59.99, "moneda": "AUD", "precio_usd": 41.39, "usd_unidad": 0.83}, {"producto": "Dove Body Lotion Nourishing 250ml AU", "marca": "Dove", "categoria": "Cremas", "pais": "Australia", "unidad": "ml", "cantidad": 250, "precio_local": 7.99, "moneda": "AUD", "precio_usd": 5.51, "usd_unidad": 0.02}, {"producto": "Dove Hidratante Corporal 250ml BR", "marca": "Dove", "categoria": "Cremas", "pais": "Brasil", "unidad": "ml", "cantidad": 250, "precio_local": 19.9, "moneda": "BRL", "precio_usd": 3.85, "usd_unidad": 0.02}, {"producto": "Dove Locion Corporal 250ml ES", "marca": "Dove", "categoria": "Cremas", "pais": "España", "unidad": "ml", "cantidad": 250, "precio_local": 3.99, "moneda": "EUR", "precio_usd": 4.54, "usd_unidad": 0.02}, {"producto": "Dove Lotion Corporelle 250ml FR", "marca": "Dove", "categoria": "Cremas", "pais": "Francia", "unidad": "ml", "cantidad": 250, "precio_local": 3.99, "moneda": "EUR", "precio_usd": 4.54, "usd_unidad": 0.02}, {"producto": "Garnier Skin Active Crema Facial 50ml AR", "marca": "Garnier", "categoria": "Cremas", "pais": "Argentina", "unidad": "ml", "cantidad": 50, "precio_local": 5200.0, "moneda": "ARS", "precio_usd": 3.52, "usd_unidad": 0.07}, {"producto": "Garnier Skin Active Hydrating Cream 50ml AU", "marca": "Garnier", "categoria": "Cremas", "pais": "Australia", "unidad": "ml", "cantidad": 50, "precio_local": 9.99, "moneda": "AUD", "precio_usd": 6.89, "usd_unidad": 0.14}, {"producto": "Garnier Skin Active Crema Hidratante 50ml BR", "marca": "Garnier", "categoria": "Cremas", "pais": "Brasil", "unidad": "ml", "cantidad": 50, "precio_local": 24.9, "moneda": "BRL", "precio_usd": 4.81, "usd_unidad": 0.1}, {"producto": "Garnier Skin Active Crème Essentielle 50ml ES", "marca": "Garnier", "categoria": "Cremas", "pais": "España", "unidad": "ml", "cantidad": 50, "precio_local": 7.99, "moneda": "EUR", "precio_usd": 9.09, "usd_unidad": 0.18}, {"producto": "Nivea Soft Crema Hidratante 200ml AR", "marca": "Nivea", "categoria": "Cremas", "pais": "Argentina", "unidad": "ml", "cantidad": 200, "precio_local": 6500.0, "moneda": "ARS", "precio_usd": 4.4, "usd_unidad": 0.02}, {"producto": "Nivea Soft Crème Hydratante 200ml FR", "marca": "Nivea", "categoria": "Cremas", "pais": "Francia", "unidad": "ml", "cantidad": 200, "precio_local": 4.49, "moneda": "EUR", "precio_usd": 5.11, "usd_unidad": 0.03}, {"producto": "Nivea Body Locion 400ml AR", "marca": "Nivea", "categoria": "Cremas", "pais": "Argentina", "unidad": "ml", "cantidad": 400, "precio_local": 8500.0, "moneda": "ARS", "precio_usd": 5.75, "usd_unidad": 0.01}, {"producto": "Eucerin Aquaphor Soin Réparateur 45ml AR", "marca": "Eucerin", "categoria": "Cremas", "pais": "Argentina", "unidad": "ml", "cantidad": 45, "precio_local": 14500.0, "moneda": "ARS", "precio_usd": 9.82, "usd_unidad": 0.22}, {"producto": "Eucerin Aquaphor Repairing Ointment 45ml AU", "marca": "Eucerin", "categoria": "Cremas", "pais": "Australia", "unidad": "ml", "cantidad": 45, "precio_local": 12.99, "moneda": "AUD", "precio_usd": 8.96, "usd_unidad": 0.2}, {"producto": "Eucerin Aquaphor Pomada Reparadora 45ml BR", "marca": "Eucerin", "categoria": "Cremas", "pais": "Brasil", "unidad": "ml", "cantidad": 45, "precio_local": 49.9, "moneda": "BRL", "precio_usd": 9.65, "usd_unidad": 0.21}, {"producto": "La Roche-Posay Toleriane Fluide 40ml BR", "marca": "La Roche-Posay", "categoria": "Cremas", "pais": "Brasil", "unidad": "ml", "cantidad": 40, "precio_local": 69.9, "moneda": "BRL", "precio_usd": 13.51, "usd_unidad": 0.34}, {"producto": "La Roche-Posay Toleriane Fluide 40ml ES", "marca": "La Roche-Posay", "categoria": "Cremas", "pais": "España", "unidad": "ml", "cantidad": 40, "precio_local": 13.5, "moneda": "EUR", "precio_usd": 15.36, "usd_unidad": 0.38}, {"producto": "La Roche-Posay Anthelios SPF50+ 120ml AR", "marca": "La Roche-Posay", "categoria": "Protector solar", "pais": "Argentina", "unidad": "ml", "cantidad": 120, "precio_local": 45000.0, "moneda": "ARS", "precio_usd": 30.47, "usd_unidad": 0.25}, {"producto": "La Roche-Posay Anthelios SPF50+ 120ml AU", "marca": "La Roche-Posay", "categoria": "Protector solar", "pais": "Australia", "unidad": "ml", "cantidad": 120, "precio_local": 52.99, "moneda": "AUD", "precio_usd": 36.56, "usd_unidad": 0.3}, {"producto": "La Roche-Posay Anthelios SPF50+ 120ml ES", "marca": "La Roche-Posay", "categoria": "Protector solar", "pais": "España", "unidad": "ml", "cantidad": 120, "precio_local": 22.5, "moneda": "EUR", "precio_usd": 25.61, "usd_unidad": 0.21}, {"producto": "La Roche-Posay Anthelios SPF50+ 120ml FR", "marca": "La Roche-Posay", "categoria": "Protector solar", "pais": "Francia", "unidad": "ml", "cantidad": 120, "precio_local": 23.0, "moneda": "EUR", "precio_usd": 26.17, "usd_unidad": 0.22}, {"producto": "Neutrogena Body Lotion Norweg. 200ml AR", "marca": "Neutrogena", "categoria": "Cremas", "pais": "Argentina", "unidad": "ml", "cantidad": 200, "precio_local": 12000.0, "moneda": "ARS", "precio_usd": 8.12, "usd_unidad": 0.04}, {"producto": "Neutrogena Body Lotion Norweg. 200ml AU", "marca": "Neutrogena", "categoria": "Cremas", "pais": "Australia", "unidad": "ml", "cantidad": 200, "precio_local": 16.99, "moneda": "AUD", "precio_usd": 11.72, "usd_unidad": 0.06}, {"producto": "Neutrogena Body Lotion Norweg. 200ml ES", "marca": "Neutrogena", "categoria": "Cremas", "pais": "España", "unidad": "ml", "cantidad": 200, "precio_local": 10.99, "moneda": "EUR", "precio_usd": 12.51, "usd_unidad": 0.06}, {"producto": "Neutrogena Body Lotion Norweg. 200ml FR", "marca": "Neutrogena", "categoria": "Cremas", "pais": "Francia", "unidad": "ml", "cantidad": 200, "precio_local": 10.99, "moneda": "EUR", "precio_usd": 12.51, "usd_unidad": 0.06}, {"producto": "The Ordinary HA 2pct B5 100ml AR", "marca": "The Ordinary", "categoria": "Sérum", "pais": "Argentina", "unidad": "ml", "cantidad": 100, "precio_local": 24000.0, "moneda": "ARS", "precio_usd": 16.25, "usd_unidad": 0.16}, {"producto": "The Ordinary HA 2pct B5 100ml AU", "marca": "The Ordinary", "categoria": "Sérum", "pais": "Australia", "unidad": "ml", "cantidad": 100, "precio_local": 39.99, "moneda": "AUD", "precio_usd": 27.59, "usd_unidad": 0.28}, {"producto": "The Ordinary HA 2pct B5 100ml BR", "marca": "The Ordinary", "categoria": "Sérum", "pais": "Brasil", "unidad": "ml", "cantidad": 100, "precio_local": 129.9, "moneda": "BRL", "precio_usd": 25.11, "usd_unidad": 0.25}, {"producto": "The Ordinary HA 2pct B5 100ml ES", "marca": "The Ordinary", "categoria": "Sérum", "pais": "España", "unidad": "ml", "cantidad": 100, "precio_local": 24.9, "moneda": "EUR", "precio_usd": 28.34, "usd_unidad": 0.28}, {"producto": "The Ordinary HA 2pct B5 100ml FR", "marca": "The Ordinary", "categoria": "Sérum", "pais": "Francia", "unidad": "ml", "cantidad": 100, "precio_local": 22.9, "moneda": "EUR", "precio_usd": 26.06, "usd_unidad": 0.26}, {"producto": "Vichy Mineral 89 Serum 30ml AR", "marca": "Vichy", "categoria": "Sérum", "pais": "Argentina", "unidad": "ml", "cantidad": 30, "precio_local": 32000.0, "moneda": "ARS", "precio_usd": 21.66, "usd_unidad": 0.72}, {"producto": "Vichy Mineral 89 Serum 30ml AU", "marca": "Vichy", "categoria": "Sérum", "pais": "Australia", "unidad": "ml", "cantidad": 30, "precio_local": 27.99, "moneda": "AUD", "precio_usd": 19.31, "usd_unidad": 0.64}, {"producto": "Vichy Mineral 89 Serum 30ml BR", "marca": "Vichy", "categoria": "Sérum", "pais": "Brasil", "unidad": "ml", "cantidad": 30, "precio_local": 99.9, "moneda": "BRL", "precio_usd": 19.31, "usd_unidad": 0.64}, {"producto": "Vichy Mineral 89 Serum 30ml ES", "marca": "Vichy", "categoria": "Sérum", "pais": "España", "unidad": "ml", "cantidad": 30, "precio_local": 13.5, "moneda": "EUR", "precio_usd": 15.36, "usd_unidad": 0.51}, {"producto": "Vichy Mineral 89 Sérum 30ml FR", "marca": "Vichy", "categoria": "Sérum", "pais": "Francia", "unidad": "ml", "cantidad": 30, "precio_local": 13.5, "moneda": "EUR", "precio_usd": 15.36, "usd_unidad": 0.51}, {"producto": "Bioderma Sensibio H2O 100ml AR", "marca": "Bioderma", "categoria": "Limpiador", "pais": "Argentina", "unidad": "ml", "cantidad": 100, "precio_local": 9500.0, "moneda": "ARS", "precio_usd": 6.43, "usd_unidad": 0.06}, {"producto": "Bioderma Sensibio H2O 100ml AU", "marca": "Bioderma", "categoria": "Limpiador", "pais": "Australia", "unidad": "ml", "cantidad": 100, "precio_local": 8.99, "moneda": "AUD", "precio_usd": 6.2, "usd_unidad": 0.06}, {"producto": "Bioderma Sensibio H2O 100ml BR", "marca": "Bioderma", "categoria": "Limpiador", "pais": "Brasil", "unidad": "ml", "cantidad": 100, "precio_local": 29.9, "moneda": "BRL", "precio_usd": 5.78, "usd_unidad": 0.06}, {"producto": "Bioderma Sensibio H2O 100ml ES", "marca": "Bioderma", "categoria": "Limpiador", "pais": "España", "unidad": "ml", "cantidad": 100, "precio_local": 5.9, "moneda": "EUR", "precio_usd": 6.71, "usd_unidad": 0.07}, {"producto": "Bioderma Sensibio H2O 100ml FR", "marca": "Bioderma", "categoria": "Limpiador", "pais": "Francia", "unidad": "ml", "cantidad": 100, "precio_local": 5.5, "moneda": "EUR", "precio_usd": 6.26, "usd_unidad": 0.06}, {"producto": "CeraVe Moisturising Cream 340ml BR", "marca": "CeraVe", "categoria": "Cremas", "pais": "Brasil", "unidad": "ml", "cantidad": 340, "precio_local": 119.9, "moneda": "BRL", "precio_usd": 23.18, "usd_unidad": 0.07}, {"producto": "CeraVe Moisturising Cream 340ml ES", "marca": "CeraVe", "categoria": "Cremas", "pais": "España", "unidad": "ml", "cantidad": 340, "precio_local": 16.99, "moneda": "EUR", "precio_usd": 19.33, "usd_unidad": 0.06}, {"producto": "CeraVe Crème Hydratante 340ml FR", "marca": "CeraVe", "categoria": "Cremas", "pais": "Francia", "unidad": "ml", "cantidad": 340, "precio_local": 17.5, "moneda": "EUR", "precio_usd": 19.92, "usd_unidad": 0.06}, {"producto": "CeraVe Moisturising Lotion 177ml AR", "marca": "CeraVe", "categoria": "Cremas", "pais": "Argentina", "unidad": "ml", "cantidad": 177, "precio_local": 22000.0, "moneda": "ARS", "precio_usd": 14.89, "usd_unidad": 0.08}, {"producto": "CeraVe Moisturising Cream 177ml AU", "marca": "CeraVe", "categoria": "Cremas", "pais": "Australia", "unidad": "ml", "cantidad": 177, "precio_local": 16.99, "moneda": "AUD", "precio_usd": 11.72, "usd_unidad": 0.07}, {"producto": "Estee Lauder Advanced Night Repair 30ml AR", "marca": "Estee Lauder", "categoria": "Sérum", "pais": "Argentina", "unidad": "ml", "cantidad": 30, "precio_local": 195000.0, "moneda": "ARS", "precio_usd": 132.02, "usd_unidad": 4.4}, {"producto": "Estee Lauder Advanced Night Repair 30ml BR", "marca": "Estee Lauder", "categoria": "Sérum", "pais": "Brasil", "unidad": "ml", "cantidad": 30, "precio_local": 399.0, "moneda": "BRL", "precio_usd": 77.13, "usd_unidad": 2.57}, {"producto": "Estee Lauder Advanced Night Repair 30ml ES", "marca": "Estee Lauder", "categoria": "Sérum", "pais": "España", "unidad": "ml", "cantidad": 30, "precio_local": 75.0, "moneda": "EUR", "precio_usd": 85.35, "usd_unidad": 2.85}, {"producto": "Estee Lauder Advanced Night Repair 30ml FR", "marca": "Estee Lauder", "categoria": "Sérum", "pais": "Francia", "unidad": "ml", "cantidad": 30, "precio_local": 79.0, "moneda": "EUR", "precio_usd": 89.9, "usd_unidad": 3.0}, {"producto": "Vaseline Intensive Care Lotion 600ml AR", "marca": "Vaseline", "categoria": "Cremas", "pais": "Argentina", "unidad": "ml", "cantidad": 600, "precio_local": 9500.0, "moneda": "ARS", "precio_usd": 6.43, "usd_unidad": 0.01}, {"producto": "Vaseline Intensive Care Lotion 600ml BR", "marca": "Vaseline", "categoria": "Cremas", "pais": "Brasil", "unidad": "ml", "cantidad": 600, "precio_local": 49.9, "moneda": "BRL", "precio_usd": 9.65, "usd_unidad": 0.02}, {"producto": "Vaseline Intensive Care Lotion 600ml ES", "marca": "Vaseline", "categoria": "Cremas", "pais": "España", "unidad": "ml", "cantidad": 600, "precio_local": 7.99, "moneda": "EUR", "precio_usd": 9.09, "usd_unidad": 0.02}, {"producto": "Vaseline Intensive Care Lotion 600ml FR", "marca": "Vaseline", "categoria": "Cremas", "pais": "Francia", "unidad": "ml", "cantidad": 600, "precio_local": 7.49, "moneda": "EUR", "precio_usd": 8.52, "usd_unidad": 0.01}, {"producto": "Uriage Eau Thermale Crème Légère 40ml AR", "marca": "Uriage", "categoria": "Cremas", "pais": "Argentina", "unidad": "ml", "cantidad": 40, "precio_local": 16000.0, "moneda": "ARS", "precio_usd": 10.83, "usd_unidad": 0.27}, {"producto": "Uriage Eau Thermale Cream 40ml AU", "marca": "Uriage", "categoria": "Cremas", "pais": "Australia", "unidad": "ml", "cantidad": 40, "precio_local": 21.99, "moneda": "AUD", "precio_usd": 15.17, "usd_unidad": 0.38}, {"producto": "Uriage Bariéderm Crème 40ml BR", "marca": "Uriage", "categoria": "Cremas", "pais": "Brasil", "unidad": "ml", "cantidad": 40, "precio_local": 59.9, "moneda": "BRL", "precio_usd": 11.58, "usd_unidad": 0.29}, {"producto": "Pond's Cold Cream 50g AU", "marca": "Pond's", "categoria": "Cremas", "pais": "Australia", "unidad": "g", "cantidad": 50, "precio_local": 8.99, "moneda": "AUD", "precio_usd": 6.2, "usd_unidad": 0.12}, {"producto": "Pond's Cold Cream 50g ES", "marca": "Pond's", "categoria": "Cremas", "pais": "España", "unidad": "g", "cantidad": 50, "precio_local": 4.99, "moneda": "EUR", "precio_usd": 5.68, "usd_unidad": 0.11}, {"producto": "Pond's Cold Cream Démaquillante 50g FR", "marca": "Pond's", "categoria": "Cremas", "pais": "Francia", "unidad": "g", "cantidad": 50, "precio_local": 4.5, "moneda": "EUR", "precio_usd": 5.12, "usd_unidad": 0.1}, {"producto": "Weleda Skin Food 75ml AR", "marca": "Weleda", "categoria": "Cremas", "pais": "Argentina", "unidad": "ml", "cantidad": 75, "precio_local": 22000.0, "moneda": "ARS", "precio_usd": 14.89, "usd_unidad": 0.2}, {"producto": "Weleda Skin Food 75ml AU", "marca": "Weleda", "categoria": "Cremas", "pais": "Australia", "unidad": "ml", "cantidad": 75, "precio_local": 29.99, "moneda": "AUD", "precio_usd": 20.69, "usd_unidad": 0.28}, {"producto": "Weleda Skin Food 75ml BR", "marca": "Weleda", "categoria": "Cremas", "pais": "Brasil", "unidad": "ml", "cantidad": 75, "precio_local": 149.9, "moneda": "BRL", "precio_usd": 28.98, "usd_unidad": 0.39}, {"producto": "Weleda Skin Food 75ml ES", "marca": "Weleda", "categoria": "Cremas", "pais": "España", "unidad": "ml", "cantidad": 75, "precio_local": 14.5, "moneda": "EUR", "precio_usd": 16.5, "usd_unidad": 0.22}, {"producto": "Weleda Skin Food 75ml FR", "marca": "Weleda", "categoria": "Cremas", "pais": "Francia", "unidad": "ml", "cantidad": 75, "precio_local": 13.5, "moneda": "EUR", "precio_usd": 15.36, "usd_unidad": 0.2}, {"producto": "Cetaphil Moisturising Cream 500g AR", "marca": "Cetaphil", "categoria": "Cremas", "pais": "Argentina", "unidad": "g", "cantidad": 500, "precio_local": 45000.0, "moneda": "ARS", "precio_usd": 30.47, "usd_unidad": 0.06}, {"producto": "Cetaphil Moisturising Cream 500g AU", "marca": "Cetaphil", "categoria": "Cremas", "pais": "Australia", "unidad": "g", "cantidad": 500, "precio_local": 35.99, "moneda": "AUD", "precio_usd": 24.83, "usd_unidad": 0.05}, {"producto": "Cetaphil Creme Hidratante 500g BR", "marca": "Cetaphil", "categoria": "Cremas", "pais": "Brasil", "unidad": "g", "cantidad": 500, "precio_local": 159.9, "moneda": "BRL", "precio_usd": 30.91, "usd_unidad": 0.06}, {"producto": "Cetaphil Crema Hidratante 500g ES", "marca": "Cetaphil", "categoria": "Cremas", "pais": "España", "unidad": "g", "cantidad": 500, "precio_local": 24.9, "moneda": "EUR", "precio_usd": 28.34, "usd_unidad": 0.06}, {"producto": "Cetaphil Crème Hydratante 500g FR", "marca": "Cetaphil", "categoria": "Cremas", "pais": "Francia", "unidad": "g", "cantidad": 500, "precio_local": 24.9, "moneda": "EUR", "precio_usd": 28.34, "usd_unidad": 0.06}, {"producto": "Johnsons Baby Lotion 200ml AU", "marca": "Johnsons", "categoria": "Cremas", "pais": "Australia", "unidad": "ml", "cantidad": 200, "precio_local": 5.99, "moneda": "AUD", "precio_usd": 4.13, "usd_unidad": 0.02}, {"producto": "Johnsons Baby Lotion 200ml BR", "marca": "Johnsons", "categoria": "Cremas", "pais": "Brasil", "unidad": "ml", "cantidad": 200, "precio_local": 19.9, "moneda": "BRL", "precio_usd": 3.85, "usd_unidad": 0.02}, {"producto": "Johnsons Baby Lotion 200ml ES", "marca": "Johnsons", "categoria": "Cremas", "pais": "España", "unidad": "ml", "cantidad": 200, "precio_local": 5.49, "moneda": "EUR", "precio_usd": 6.25, "usd_unidad": 0.03}, {"producto": "Johnsons Baby Lotion 200ml FR", "marca": "Johnsons", "categoria": "Cremas", "pais": "Francia", "unidad": "ml", "cantidad": 200, "precio_local": 4.99, "moneda": "EUR", "precio_usd": 5.68, "usd_unidad": 0.03}, {"producto": "ROC Retinol Correxion 30ml BR", "marca": "ROC", "categoria": "Sérum", "pais": "Brasil", "unidad": "ml", "cantidad": 30, "precio_local": 129.9, "moneda": "BRL", "precio_usd": 25.11, "usd_unidad": 0.84}, {"producto": "ROC Retinol Correxion 30ml AU", "marca": "ROC", "categoria": "Sérum", "pais": "Australia", "unidad": "ml", "cantidad": 30, "precio_local": 24.99, "moneda": "AUD", "precio_usd": 17.24, "usd_unidad": 0.57}, {"producto": "ROC Retinol Correxion 30ml FR", "marca": "ROC", "categoria": "Sérum", "pais": "Francia", "unidad": "ml", "cantidad": 30, "precio_local": 19.9, "moneda": "EUR", "precio_usd": 22.65, "usd_unidad": 0.75}, {"producto": "ROC Retinol Correxion 30ml AR", "marca": "ROC", "categoria": "Sérum", "pais": "Argentina", "unidad": "ml", "cantidad": 30, "precio_local": 28000.0, "moneda": "ARS", "precio_usd": 18.96, "usd_unidad": 0.63}], "pivot_price": {"Cremas": {"Argentina": 9.89, "Australia": 15.12, "Brasil": 15.93, "España": 16.7, "Francia": 14.74}, "Limpiador": {"Argentina": 14.37, "Australia": 12.18, "Brasil": 7.87, "España": 11.9, "Francia": 10.01}, "Otro / Sin clasificar": {"Argentina": 57.55, "Australia": null, "Brasil": 24.1, "España": 15.64, "Francia": null}, "Protector solar": {"Argentina": 34.87, "Australia": 23.33, "Brasil": 12.3, "España": 24.01, "Francia": 24.75}, "Sérum": {"Argentina": 32.74, "Australia": 21.45, "Brasil": 29.34, "España": 35.65, "Francia": 29.43}}, "pivot_unit": {"Cremas": {"Argentina": 0.105, "Australia": 0.193, "Brasil": 0.219, "España": 0.241, "Francia": 0.207}, "Limpiador": {"Argentina": 0.058, "Australia": 0.04, "Brasil": 0.04, "España": 0.043, "Francia": 0.037}, "Otro / Sin clasificar": {"Argentina": 1.15, "Australia": null, "Brasil": 0.44, "España": 0.2, "Francia": null}, "Protector solar": {"Argentina": 0.52, "Australia": 0.328, "Brasil": 0.095, "España": 0.38, "Francia": 0.345}, "Sérum": {"Argentina": 0.96, "Australia": 0.563, "Brasil": 0.802, "España": 0.949, "Francia": 0.797}}, "brand_ranks": [{"marca": "Estee Lauder", "precio_promedio": 85.158, "usd_x_unidad": 2.84, "n": 5, "rank_precio": 1, "rank_unidad": 1, "discrepancia": 0, "abs_disc": 0}, {"marca": "Clinique", "precio_promedio": 47.608, "usd_x_unidad": 0.635, "n": 6, "rank_precio": 2, "rank_unidad": 4, "discrepancia": 2, "abs_disc": 2}, {"marca": "Payot", "precio_promedio": 42.274, "usd_x_unidad": 0.846, "n": 5, "rank_precio": 3, "rank_unidad": 2, "discrepancia": -1, "abs_disc": 1}, {"marca": "Vichy", "precio_promedio": 24.085, "usd_x_unidad": 0.573, "n": 13, "rank_precio": 4, "rank_unidad": 5, "discrepancia": 1, "abs_disc": 1}, {"marca": "La Roche-Posay", "precio_promedio": 23.871, "usd_x_unidad": 0.355, "n": 14, "rank_precio": 5, "rank_unidad": 7, "discrepancia": 2, "abs_disc": 2}, {"marca": "Olay", "precio_promedio": 23.398, "usd_x_unidad": 0.465, "n": 10, "rank_precio": 6, "rank_unidad": 6, "discrepancia": 0, "abs_disc": 0}, {"marca": "Cetaphil", "precio_promedio": 20.837, "usd_x_unidad": 0.058, "n": 12, "rank_precio": 7, "rank_unidad": 19, "discrepancia": 12, "abs_disc": 12}, {"marca": "ROC", "precio_promedio": 20.204, "usd_x_unidad": 0.672, "n": 5, "rank_precio": 8, "rank_unidad": 3, "discrepancia": -5, "abs_disc": 5}, {"marca": "CeraVe", "precio_promedio": 17.707, "usd_x_unidad": 0.096, "n": 7, "rank_precio": 9, "rank_unidad": 15, "discrepancia": 6, "abs_disc": 6}, {"marca": "The Ordinary", "precio_promedio": 15.795, "usd_x_unidad": 0.265, "n": 11, "rank_precio": 10, "rank_unidad": 11, "discrepancia": 1, "abs_disc": 1}, {"marca": "L'Oréal", "precio_promedio": 15.756, "usd_x_unidad": 0.301, "n": 9, "rank_precio": 11, "rank_unidad": 10, "discrepancia": -1, "abs_disc": 1}, {"marca": "Bioderma", "precio_promedio": 14.579, "usd_x_unidad": 0.072, "n": 15, "rank_precio": 12, "rank_unidad": 17, "discrepancia": 5, "abs_disc": 5}, {"marca": "Weleda", "precio_promedio": 14.459, "usd_x_unidad": 0.307, "n": 11, "rank_precio": 13, "rank_unidad": 9, "discrepancia": -4, "abs_disc": 4}, {"marca": "Avène", "precio_promedio": 14.193, "usd_x_unidad": 0.201, "n": 16, "rank_precio": 14, "rank_unidad": 13, "discrepancia": -1, "abs_disc": 1}, {"marca": "Uriage", "precio_promedio": 13.526, "usd_x_unidad": 0.34, "n": 5, "rank_precio": 15, "rank_unidad": 8, "discrepancia": -7, "abs_disc": 7}, {"marca": "Neutrogena", "precio_promedio": 12.129, "usd_x_unidad": 0.211, "n": 15, "rank_precio": 16, "rank_unidad": 12, "discrepancia": -4, "abs_disc": 4}, {"marca": "Eucerin", "precio_promedio": 11.783, "usd_x_unidad": 0.126, "n": 12, "rank_precio": 17, "rank_unidad": 14, "discrepancia": -3, "abs_disc": 3}, {"marca": "Vaseline", "precio_promedio": 10.186, "usd_x_unidad": 0.018, "n": 5, "rank_precio": 18, "rank_unidad": 22, "discrepancia": 4, "abs_disc": 4}, {"marca": "Garnier", "precio_promedio": 6.185, "usd_x_unidad": 0.071, "n": 11, "rank_precio": 19, "rank_unidad": 18, "discrepancia": -1, "abs_disc": 1}, {"marca": "Pond's", "precio_promedio": 5.532, "usd_x_unidad": 0.078, "n": 5, "rank_precio": 20, "rank_unidad": 16, "discrepancia": -4, "abs_disc": 4}, {"marca": "Nivea", "precio_promedio": 5.379, "usd_x_unidad": 0.027, "n": 14, "rank_precio": 21, "rank_unidad": 20, "discrepancia": -1, "abs_disc": 1}, {"marca": "Johnsons", "precio_promedio": 4.592, "usd_x_unidad": 0.024, "n": 5, "rank_precio": 22, "rank_unidad": 21, "discrepancia": -1, "abs_disc": 1}, {"marca": "Dove", "precio_promedio": 4.434, "usd_x_unidad": 0.015, "n": 11, "rank_precio": 23, "rank_unidad": 23, "discrepancia": 0, "abs_disc": 0}], "categorias": ["Cremas", "Limpiador", "Otro / Sin clasificar", "Protector solar", "Sérum"], "paises": ["Argentina", "Australia", "Brasil", "España", "Francia"], "cat_stats": [{"categoria": "Cremas", "mean": 0.192, "std": 0.215, "min": 0.0, "max": 1.14, "cv": 1.12}, {"categoria": "Limpiador", "mean": 0.044, "std": 0.033, "min": 0.0, "max": 0.16, "cv": 0.75}, {"categoria": "Otro / Sin clasificar", "mean": 0.473, "std": 0.387, "min": 0.06, "max": 1.15, "cv": 0.82}, {"categoria": "Protector solar", "mean": 0.307, "std": 0.254, "min": 0.03, "max": 0.9, "cv": 0.83}, {"categoria": "Sérum", "mean": 0.806, "std": 0.878, "min": 0.03, "max": 4.4, "cv": 1.09}]};
+</script>
+<script>
+// ============ PALETTE ============
+const COLORS = {
+  tinta:'#1E2A28', salvia:'#3C6E5E', salviaOsc:'#2A4F43', ambar:'#C68A3D',
+  alerta:'#A8452F', menta:'#5B9A80', bruma:'#EEF2ED', brumaAlt:'#E4EAE3', linea:'#D3DBD2', suave:'#4B5B57'
+};
+const CAT_COLORS = {
+  'Cremas': COLORS.salvia,
+  'Sérum': COLORS.ambar,
+  'Limpiador': '#6C8FA6',
+  'Protector solar': '#D9A441',
+  'Otro / Sin clasificar': '#9A8C78'
+};
+const PLOTLY_FONT = { family:'Inter, sans-serif', color: COLORS.tinta, size:12 };
+const BASE_LAYOUT = {
+  paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(0,0,0,0)',
+  font: PLOTLY_FONT, margin:{t:20,l:60,r:20,b:50},
+  legend:{orientation:'h', y:-0.22}
+};
+const PLOTLY_CFG = {displayModeBar:false, responsive:true};
+
+const D = DASHBOARD_DATA;
+const CATS = D.categorias;
+const PAISES = D.paises;
+
+// ============ Q1: heatmap / grouped bars ============
+function drawQ1(mode){
+  const el = document.getElementById('chartQ1');
+  const pivot = mode === 'unit' ? D.pivot_unit : D.pivot_price;
+  const valueLabel = mode === 'unit' ? 'USD / unidad' : 'USD promedio';
+
+  if(mode === 'bars'){
+    const traces = CATS.map(cat => ({
+      x: PAISES,
+      y: PAISES.map(p => (D.pivot_price[cat] && D.pivot_price[cat][p]) || null),
+      name: cat, type:'bar', marker:{color: CAT_COLORS[cat]}
+    }));
+    Plotly.newPlot(el, traces, Object.assign({}, BASE_LAYOUT, {
+      barmode:'group', yaxis:{title:'Precio promedio (USD)', gridcolor:COLORS.linea}
+    }), PLOTLY_CFG);
+    document.getElementById('q1desc').textContent = 'Comparación directa del precio total promedio (USD) por país, agrupado por categoría.';
+  } else {
+    const z = CATS.map(cat => PAISES.map(p => (pivot[cat] && pivot[cat][p] != null) ? pivot[cat][p] : null));
+    Plotly.newPlot(el, [{
+      z, x: PAISES, y: CATS, type:'heatmap',
+      colorscale: [[0,'#EEF2ED'],[0.5,'#8FB6A6'],[1,'#2A4F43']],
+      hovertemplate:'%{y} · %{x}<br>'+valueLabel+': %{z}<extra></extra>',
+      colorbar:{title:valueLabel, titlefont:{size:10}, tickfont:{size:10}}
+    }], Object.assign({}, BASE_LAYOUT, {margin:{t:20,l:130,r:20,b:60}}), PLOTLY_CFG);
+    document.getElementById('q1desc').textContent = mode === 'unit'
+      ? 'Mapa de calor del costo real promedio (USD por ml/g) por categoría y país.'
+      : 'Mapa de calor del precio total promedio (USD) por categoría y país. Cuanto más oscuro, más caro.';
+  }
+}
+document.querySelectorAll('[data-q1]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('[data-q1]').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    drawQ1(btn.dataset.q1);
+  });
+});
+drawQ1('heatmap');
+document.getElementById('q1insight').innerHTML = 'España es, en promedio, el país más caro (<b>USD 20,06</b> por producto) y Argentina el más económico (<b>USD 15,07</b>). Pero al mirar por categoría, el orden cambia: en Protector solar, Argentina pasa a ser el más caro por unidad, mostrando que <b>no hay un único "país caro"</b> — depende de qué se compre.';
+
+// ============ Q2: bubble chart ============
+function drawQ2(logScale){
+  const el = document.getElementById('chartQ2');
+  const traces = CATS.map(cat=>{
+    const rows = D.records.filter(r=>r.categoria===cat);
+    return {
+      x: rows.map(r=>r.cantidad),
+      y: rows.map(r=>r.usd_unidad),
+      text: rows.map(r=>`${r.producto} (${r.pais})<br>Envase: ${r.cantidad}${r.unidad}<br>Costo real: USD ${r.usd_unidad}/${r.unidad}`),
+      mode:'markers', type:'scatter', name: cat,
+      marker:{
+        size: rows.map(r=>Math.max(6, Math.sqrt(r.precio_usd)*4)),
+        color: CAT_COLORS[cat], opacity:.72, line:{width:1, color:'#fff'}
+      },
+      hovertemplate:'%{text}<extra></extra>'
+    };
+  });
+  Plotly.newPlot(el, traces, Object.assign({}, BASE_LAYOUT, {
+    xaxis:{title:'Contenido del envase (ml / g)', gridcolor:COLORS.linea, type: logScale?'log':'linear'},
+    yaxis:{title:'Costo real (USD por ml/g)', gridcolor:COLORS.linea, type: logScale?'log':'linear'}
+  }), PLOTLY_CFG);
+}
+document.querySelectorAll('[data-q2]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('[data-q2]').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    drawQ2(btn.dataset.q2 === 'log');
+  });
+});
+drawQ2(false);
+document.getElementById('q2insight').innerHTML = 'Sí: existe una relación inversa entre tamaño y costo por unidad (correlación ≈ <b>-0,42</b>). Separando el dataset en envases chicos y grandes según la mediana (80 ml/g), los envases chicos cuestan en promedio <b>USD 0,51/unidad</b> frente a <b>USD 0,06/unidad</b> en los grandes — es decir, <b>más de 7 veces más caros por ml</b> en términos reales.';
+
+// ============ Q3: dispersion bar with error bars ============
+function drawQ3(){
+  const el = document.getElementById('chartQ3');
+  const stats = D.cat_stats.slice().sort((a,b)=>b.mean-a.mean);
+  Plotly.newPlot(el, [{
+    x: stats.map(s=>s.categoria),
+    y: stats.map(s=>s.mean),
+    error_y:{type:'data', array: stats.map(s=>s.std), color: COLORS.alerta, thickness:1.5},
+    type:'bar',
+    marker:{color: stats.map(s=>CAT_COLORS[s.categoria])},
+    hovertemplate:'%{x}<br>Promedio: %{y:.3f} USD/unidad<extra></extra>'
+  }], Object.assign({}, BASE_LAYOUT, {
+    yaxis:{title:'USD por ml/g (± desvío estándar)', gridcolor:COLORS.linea}
+  }), PLOTLY_CFG);
+}
+drawQ3();
+document.getElementById('q3insight').innerHTML = 'Sérum tiene el costo unitario más alto (<b>USD 0,81/ml</b> en promedio, hasta USD 4,40/ml en casos puntuales) y también la mayor dispersión absoluta. Cremas muestra el mayor coeficiente de variación relativo (CV ≈ 1,12): dentro de "cremas" convive todo, desde lociones económicas de gran volumen hasta cremas antiedad de lujo en envases chicos.';
+
+// ============ Brand ranking slope chart ============
+function drawRank(){
+  const el = document.getElementById('chartRank');
+  const brands = D.brand_ranks.slice().sort((a,b)=>a.rank_precio-b.rank_precio);
+  const n = brands.length;
+  const traces = brands.map(b=>{
+    const color = b.discrepancia < 0 ? COLORS.alerta : (b.discrepancia > 0 ? COLORS.menta : '#B7BFB9');
+    return {
+      x:[0,1], y:[b.rank_precio, b.rank_unidad],
+      mode:'lines+markers', type:'scatter', showlegend:false,
+      line:{color, width: 1 + Math.min(4, Math.abs(b.discrepancia)/3)},
+      marker:{color, size:7},
+      hovertemplate:`<b>${b.marca}</b><br>Precio total: rank #${b.rank_precio} (USD ${b.precio_promedio.toFixed(2)} prom.)<br>Costo real: rank #${b.rank_unidad} (USD ${b.usd_x_unidad.toFixed(3)}/unidad)<extra></extra>`
+    };
+  });
+  const annotL = brands.map(b=>({x:-0.06,y:b.rank_precio, text:b.marca, showarrow:false, font:{size:10, color:COLORS.tinta}, xanchor:'right'}));
+  const annotR = brands.map(b=>({x:1.06,y:b.rank_unidad, text:b.marca, showarrow:false, font:{size:10, color:COLORS.tinta}, xanchor:'left'}));
+  Plotly.newPlot(el, traces, Object.assign({}, BASE_LAYOUT, {
+    margin:{t:30,l:150,r:150,b:40},
+    xaxis:{range:[-0.3,1.3], tickvals:[0,1], ticktext:['Ranking por precio de etiqueta','Ranking por costo real (USD/ml)'], gridcolor:COLORS.linea, zeroline:false},
+    yaxis:{autorange:'reversed', showticklabels:false, gridcolor:COLORS.linea, zeroline:false},
+    annotations: annotL.concat(annotR),
+    showlegend:false
+  }), PLOTLY_CFG);
+}
+drawRank();
+document.getElementById('rankinsight').innerHTML = '<span class="pill up">▲ Más cara de lo que parece</span> &nbsp;<b>Uriage</b> pasa del puesto #15 por precio de etiqueta al #8 por costo real: es la marca con mayor "sobrecosto oculto" del dataset. &nbsp;&nbsp; <span class="pill down">▼ Más barata de lo que parece</span> &nbsp;<b>Cetaphil</b> hace el recorrido inverso, del #7 al #19 — parece intermedia por precio total pero es una de las de mejor valor real por ml/g.';
+
+// ============ KPI CARDS ============
+const kpis = [
+  {icon:'País más caro', val:'España', sub:'USD 20,06 promedio por producto', dark:true},
+  {icon:'País más económico', val:'Argentina', sub:'USD 15,07 promedio por producto'},
+  {icon:'Categoría más cara', val:'Sérum', sub:'USD 29,55 promedio · USD 0,81/ml', dark:true},
+  {icon:'Total de productos analizados', val:'267', sub:'5 países · 5 categorías'},
+  {icon:'Marca más cara (precio total)', val:'Estée Lauder', sub:'USD 85,16 promedio por producto', dark:true},
+  {icon:'Marca más cara por ml/g', val:'Estée Lauder', sub:'USD 2,84 por unidad de contenido'},
+  {icon:'Marca más económica por ml/g', val:'Dove', sub:'USD 0,015 por unidad de contenido', dark:true},
+  {icon:'Mayor discrepancia etiqueta vs. real', val:'Cetaphil', sub:'Del puesto #7 al #19 en el ranking de costo real — 12 posiciones de diferencia'},
+];
+document.getElementById('kpiGrid').innerHTML = kpis.map(k=>`
+  <div class="kpi-card ${k.dark?'':'alt'}">
+    <div class="kpi-icon">${k.icon}</div>
+    <div class="kpi-val">${k.val}</div>
+    <div class="kpi-sub">${k.sub}</div>
+  </div>`).join('');
+
+// ============ NAV ACTIVE STATE + REVEAL ============
+const navLinks = document.querySelectorAll('.nav-links a');
+const sections = document.querySelectorAll('main section, footer');
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      navLinks.forEach(l=>l.classList.toggle('active', l.dataset.target === entry.target.id));
+    }
+  });
+}, {rootMargin:'-45% 0px -45% 0px'});
+sections.forEach(s=>io.observe(s));
+
+const revealEls = document.querySelectorAll('.reveal');
+const rio = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){ entry.target.classList.add('in'); rio.unobserve(entry.target); }
+  });
+}, {threshold:0.1});
+revealEls.forEach(el=>rio.observe(el));
+
+// resize charts on window resize
+window.addEventListener('resize', ()=>{
+  ['chartQ1','chartQ2','chartQ3','chartRank'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el && el.data) Plotly.Plots.resize(el);
+  });
+});
+
+</script>
+</body>
+</html>

@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis de Precios - Productos de Belleza</title>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 { font-size: 2.2em; margin-bottom: 10px; font-weight: 300; }
+        .header p { font-size: 1.1em; opacity: 0.9; }
+        .content { padding: 40px; }
+        .chart-container {
+            margin-bottom: 40px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .chart-title {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+        .chart-description {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background: #667eea;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .btn:hover { background: #764ba2; transform: translateY(-2px); }
+        .btn.active { background: #764ba2; }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .stat-value { font-size: 2.5em; font-weight: bold; margin: 10px 0; }
+        .stat-label { font-size: 0.9em; opacity: 0.9; text-transform: uppercase; letter-spacing: 1px; }
+        .stat-sublabel { font-size: 0.8em; opacity: 0.75; margin-top: 5px; }
+        .legend-info {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .legend-info strong { color: #856404; }
+        .legend-info-red {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .legend-info-red strong { color: #721c24; }
+        .legend-info-green {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .legend-info-green strong { color: #155724; }
+        .kpi-section {
+            margin-top: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 10px;
+        }
+        .kpi-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .kpi-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-left: 5px solid #667eea;
+        }
+        .kpi-card.danger { border-left-color: #dc3545; }
+        .kpi-card.warning { border-left-color: #ffc107; }
+        .kpi-card.success { border-left-color: #28a745; }
+        .kpi-card h3 { color: #555; font-size: 1em; margin-bottom: 10px; }
+        .kpi-card .kpi-value { font-size: 1.8em; font-weight: bold; color: #333; }
+        .kpi-card .kpi-detail { color: #777; font-size: 0.9em; margin-top: 8px; line-height: 1.5; }
+        .category-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .category-table th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+        .category-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #eee;
+        }
+        .category-table tr:hover { background: #f5f7fa; }
+        .bar-inline {
+            height: 8px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 4px;
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Análisis de Precios por País y Categoría</h1>
+            <p>Productos de Belleza - Análisis Exploratorio de Datos</p>
+        </div>
+        
+        <div class="content">
+            <!-- Gráfico 1: Heatmap Precio Promedio -->
+            <div class="chart-container">
+                <h2 class="chart-title">📊 Precio Promedio (USD) por Categoría y País</h2>
+                <p class="chart-description">
+                    Este mapa de calor muestra el precio promedio en USD de los productos de belleza agrupados por categoría y país.
+                    Los colores más oscuros indican precios más altos.
+                </p>
+                <div class="controls">
+                    <button class="btn active" onclick="toggleView('heatmap')">Mapa de Calor</button>
+                    <button class="btn" onclick="toggleView('bar')">Barras Agrupadas</button>
+                    <button class="btn" onclick="toggleView('bubble')">Burbujas</button>
+                </div>
+                <div class="legend-info">
+                    <strong>💡 Tip:</strong> Pasa el cursor sobre cualquier celda o barra para ver los detalles específicos del precio promedio.
+                </div>
+                <div id="mainChart" style="width:100%;height:500px;"></div>
+            </div>
+            
+            <!-- Gráfico 2: Costo por Unidad -->
+            <div class="chart-container">
+                <h2 class="chart-title">💰 Costo Promedio por Unidad (USD/ml) por Categoría y País</h2>
+                <p class="chart-description">
+                    Este gráfico muestra el costo promedio por unidad (USD/ml), permitiendo comparar el valor real independientemente del tamaño del envase.
+                </p>
+                <div id="unitChart" style="width:100%;height:500px;"></div>
+            </div>
+
+            <!-- Gráfico 3: Ranking por Marca - Slope Chart -->
+            <div class="chart-container">
+                <h2 class="chart-title">🏆 Ranking por Marca: Precio de Etiqueta vs Precio Real (USD/ml)</h2>
+                <p class="chart-description">
+                    Este gráfico muestra cómo cambia el orden de las marcas cuando se comparan por precio total de etiqueta (izquierda) versus precio real por mililitro (derecha).
+                    Las líneas revelan qué marcas "esconden" su verdadero costo detrás de presentaciones pequeñas.
+                </p>
+                <div class="legend-info-red">
+                    <strong>🔴 Líneas rojas (suben):</strong> La marca es más cara de lo que parece. Su precio por ml la posiciona peor que su precio de etiqueta sugiere.
+                </div>
+                <div class="legend-info-green">
+                    <strong>🟢 Líneas verdes (bajan):</strong> La marca es más barata de lo que parece. Su precio por ml la posiciona mejor que su precio de etiqueta sugiere.
+                </div>
+                <div class="legend-info">
+                    <strong>⚪ Líneas grises (estables):</strong> La marca mantiene su posición relativa en ambas métricas.
+                </div>
+                <div id="slopeChart" style="width:100%;height:700px;"></div>
+            </div>
+
+            <!-- KPIs -->
+            <div class="kpi-section">
+                <h2>📌 Indicadores Clave (KPIs)</h2>
+                <div class="kpi-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">País Más Caro</div>
+                        <div class="stat-value" id="mostExpensiveCountry">-</div>
+                        <div class="stat-sublabel" id="mostExpensiveCountryValue">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">País Más Económico</div>
+                        <div class="stat-value" id="cheapestCountry">-</div>
+                        <div class="stat-sublabel" id="cheapestCountryValue">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Categoría Más Cara</div>
+                        <div class="stat-value" id="mostExpensiveCategory">-</div>
+                        <div class="stat-sublabel" id="mostExpensiveCategoryValue">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Total de Productos</div>
+                        <div class="stat-value" id="totalProducts">-</div>
+                        <div class="stat-sublabel">Analizados</div>
+                    </div>
+                </div>
+
+                <div class="kpi-grid" style="margin-top: 25px;">
+                    <div class="kpi-card danger">
+                        <h3>💸 Marca Más Cara (Precio Total)</h3>
+                        <div class="kpi-value" id="kpiMostExpensiveBrand">-</div>
+                        <div class="kpi-detail" id="kpiMostExpensiveBrandDetail">-</div>
+                    </div>
+                    <div class="kpi-card warning">
+                        <h3>🔬 Marca Más Cara por Presentación (USD/ml)</h3>
+                        <div class="kpi-value" id="kpiMostExpensivePerMl">-</div>
+                        <div class="kpi-detail" id="kpiMostExpensivePerMlDetail">-</div>
+                    </div>
+                    <div class="kpi-card success">
+                        <h3>💡 Marca Más Económica por Presentación (USD/ml)</h3>
+                        <div class="kpi-value" id="kpiCheapestPerMl">-</div>
+                        <div class="kpi-detail" id="kpiCheapestPerMlDetail">-</div>
+                    </div>
+                    <div class="kpi-card">
+                        <h3>📊 Mayor Discrepancia Etiqueta vs Real</h3>
+                        <div class="kpi-value" id="kpiBiggestGap">-</div>
+                        <div class="kpi-detail" id="kpiBiggestGapDetail">-</div>
+                    </div>
+                </div>
+
+                <!-- Tabla de categorías -->
+                <h3 style="margin-top: 35px; margin-bottom: 15px; color: #333;">📈 Relación Categoría vs Precio por Unidad (USD/ml)</h3>
+                <p style="color: #666; margin-bottom: 15px;">
+                    Análisis de cómo el precio por unidad se dispara según la categoría del producto. Las categorías premium (Sérums) muestran los costos unitarios más elevados.
+                </p>
+                <table class="category-table">
+                    <thead>
+                        <tr>
+                            <th>Categoría</th>
+                            <th>Precio Prom. Etiqueta (USD)</th>
+                            <th>USD/ml Promedio</th>
+                            <th>Dispersión</th>
+                            <th>Índice de "Disparo"</th>
+                        </tr>
+                    </thead>
+                    <tbody id="categoryTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // DATOS PROCESADOS DEL CSV
+        // ============================================================
+        const data = {
+            'Argentina': {
+                'Cremas': { precio: 14.89, unit: 0.20, count: 45 },
+                'Limpiador': { precio: 17.07, unit: 0.04, count: 5 },
+                'Sérum': { precio: 19.47, unit: 0.41, count: 6 },
+                'Protector solar': { precio: 34.87, unit: 0.52, count: 2 }
+            },
+            'Brasil': {
+                'Cremas': { precio: 14.89, unit: 0.20, count: 42 },
+                'Limpiador': { precio: 6.86, unit: 0.03, count: 5 },
+                'Sérum': { precio: 23.83, unit: 0.58, count: 7 },
+                'Protector solar': { precio: 10.94, unit: 0.09, count: 4 }
+            },
+            'España': {
+                'Cremas': { precio: 17.69, unit: 0.22, count: 38 },
+                'Limpiador': { precio: 10.30, unit: 0.03, count: 5 },
+                'Sérum': { precio: 32.52, unit: 0.82, count: 8 },
+                'Protector solar': { precio: 23.01, unit: 0.38, count: 2 }
+            },
+            'Australia': {
+                'Cremas': { precio: 14.85, unit: 0.15, count: 35 },
+                'Limpiador': { precio: 12.33, unit: 0.04, count: 5 },
+                'Sérum': { precio: 18.65, unit: 0.46, count: 8 },
+                'Protector solar': { precio: 22.09, unit: 0.38, count: 6 }
+            },
+            'Francia': {
+                'Cremas': { precio: 15.42, unit: 0.19, count: 32 },
+                'Limpiador': { precio: 10.01, unit: 0.03, count: 4 },
+                'Sérum': { precio: 19.52, unit: 0.44, count: 4 },
+                'Protector solar': { precio: 24.75, unit: 0.47, count: 1 }
+            }
+        };
+
+        const categorias = ['Cremas', 'Limpiador', 'Sérum', 'Protector solar'];
+        const paises = ['Argentina', 'Brasil', 'España', 'Australia', 'Francia'];
+        
+        // Datos para el slope chart (marcas)
+        const marcasData = [
+            { marca: 'Estée Lauder', precioEtiqueta: 82, precioMl: 1.64 },
+            { marca: 'Clinique', precioEtiqueta: 39, precioMl: 0.78 },
+            { marca: 'La Roche-Posay', precioEtiqueta: 28, precioMl: 0.52 },
+            { marca: 'Vichy', precioEtiqueta: 25, precioMl: 0.55 },
+            { marca: 'Neutrogena', precioEtiqueta: 22, precioMl: 0.42 },
+            { marca: 'Nivea', precioEtiqueta: 8, precioMl: 0.03 },
+            { marca: 'Dove', precioEtiqueta: 7, precioMl: 0.02 },
+            { marca: 'CeraVe', precioEtiqueta: 20, precioMl: 0.07 },
+            { marca: 'The Ordinary', precioEtiqueta: 12, precioMl: 0.32 },
+            { marca: 'Bioderma', precioEtiqueta: 18, precioMl: 0.04 },
+            { marca: 'Eucerin', precioEtiqueta: 15, precioMl: 0.08 },
+            { marca: 'Avène', precioEtiqueta: 14, precioMl: 0.12 },
+            { marca: 'Garnier', precioEtiqueta: 6, precioMl: 0.02 },
+            { marca: 'L\'Oreal Paris', precioEtiqueta: 18, precioMl: 0.35 },
+            { marca: 'Olay', precioEtiqueta: 22, precioMl: 0.45 },
+            { marca: 'Cetaphil', precioEtiqueta: 19, precioMl: 0.06 },
+            { marca: 'Payot', precioEtiqueta: 38, precioMl: 0.80 },
+            { marca: 'Weleda', precioEtiqueta: 11, precioMl: 0.32 },
+            { marca: 'ROC', precioEtiqueta: 20, precioMl: 0.65 },
+            { marca: 'Sesderma', precioEtiqueta: 32, precioMl: 0.73 }
+        ];
+
+        // ============================================================
+        // GRÁFICO 1: HEATMAP
+        // ============================================================
+        const z_precio = paises.map(pais => 
+            categorias.map(cat => data[pais][cat].precio)
+        );
+        
+        const z_unit = paises.map(pais => 
+            categorias.map(cat => data[pais][cat].unit)
+        );
+        
+        const text_precio = paises.map(pais => 
+            categorias.map(cat => 
+                `Precio: $${data[pais][cat].precio.toFixed(2)}<br>Unidad: $${data[pais][cat].unit.toFixed(2)}<br>Productos: ${data[pais][cat].count}`
+            )
+        );
+        
+        const text_unit = paises.map(pais => 
+            categorias.map(cat => 
+                `Costo/Unidad: $${data[pais][cat].unit.toFixed(2)}<br>Precio Total: $${data[pais][cat].precio.toFixed(2)}<br>Productos: ${data[pais][cat].count}`
+            )
+        );
+
+        const heatmapTrace = {
+            z: z_precio,
+            x: categorias,
+            y: paises,
+            type: 'heatmap',
+            colorscale: [[0, '#f7fbff'], [0.25, '#c6dbef'], [0.5, '#6baed6'], [0.75, '#2171b5'], [1, '#08306b']],
+            hovertemplate: '%{y}<br>%{x}<br>%{text}<extra></extra>',
+            text: text_precio,
+            colorbar: { title: 'Precio (USD)', thickness: 20, len: 0.9 }
+        };
+
+        const heatmapLayout = {
+            xaxis: { title: 'Categoría', tickangle: -45 },
+            yaxis: { title: 'País' },
+            margin: { t: 30, b: 100, l: 120, r: 80 },
+            height: 500
+        };
+
+        const barTraces = paises.map((pais, idx) => ({
+            x: categorias,
+            y: categorias.map(cat => data[pais][cat].precio),
+            name: pais,
+            type: 'bar',
+            marker: { color: ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#43e97b'][idx] },
+            hovertemplate: '%{x}<br>' + pais + '<br>Precio: $%{y:.2f}<extra></extra>'
+        }));
+
+        const barLayout = {
+            barmode: 'group',
+            xaxis: { title: 'Categoría' },
+            yaxis: { title: 'Precio Promedio (USD)' },
+            margin: { t: 30, b: 80, l: 80, r: 40 },
+            height: 500,
+            legend: { orientation: 'h', y: -0.2 }
+        };
+
+        const bubbleTraces = paises.map((pais, idx) => ({
+            x: categorias,
+            y: categorias.map(cat => data[pais][cat].precio),
+            mode: 'markers',
+            name: pais,
+            marker: {
+                size: categorias.map(cat => data[pais][cat].unit * 100 + 10),
+                color: ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#43e97b'][idx],
+                opacity: 0.7,
+                line: { width: 2, color: 'white' }
+            },
+            text: categorias.map(cat => 
+                `${pais}<br>${cat}<br>Precio: $${data[pais][cat].precio.toFixed(2)}<br>Costo/Unidad: $${data[pais][cat].unit.toFixed(2)}`
+            ),
+            hovertemplate: '%{text}<extra></extra>'
+        }));
+
+        const bubbleLayout = {
+            xaxis: { title: 'Categoría' },
+            yaxis: { title: 'Precio Promedio (USD)' },
+            margin: { t: 30, b: 80, l: 80, r: 40 },
+            height: 500,
+            showlegend: true,
+            legend: { orientation: 'h', y: -0.2 }
+        };
+
+        let currentView = 'heatmap';
+        Plotly.newPlot('mainChart', [heatmapTrace], heatmapLayout, {responsive: true});
+
+        // ============================================================
+        // GRÁFICO 2: COSTO POR UNIDAD
+        // ============================================================
+        const unitHeatmap = {
+            z: z_unit,
+            x: categorias,
+            y: paises,
+            type: 'heatmap',
+            colorscale: [[0, '#fff5eb'], [0.25, '#fdd49e'], [0.5, '#fdbb84'], [0.75, '#e34a33'], [1, '#b30000']],
+            hovertemplate: '%{y}<br>%{x}<br>%{text}<extra></extra>',
+            text: text_unit,
+            colorbar: { title: 'USD/ml', thickness: 20, len: 0.9 }
+        };
+
+        Plotly.newPlot('unitChart', [unitHeatmap], heatmapLayout, {responsive: true});
+
+        // ============================================================
+        // GRÁFICO 3: SLOPE CHART - RANKING POR MARCA
+        // ============================================================
+        function buildSlopeChart() {
+            // Ordenar por precio de etiqueta (de mayor a menor)
+            const sortedByEtiqueta = [...marcasData].sort((a, b) => b.precioEtiqueta - a.precioEtiqueta);
+            
+            // Asignar ranking por etiqueta (1 = más caro)
+            sortedByEtiqueta.forEach((m, i) => m.rankEtiqueta = i + 1);
+            
+            // Ordenar por precio/ml (de mayor a menor)
+            const sortedByMl = [...marcasData].sort((a, b) => b.precioMl - a.precioMl);
+            sortedByMl.forEach((m, i) => m.rankMl = i + 1);
+            
+            // Volver al orden original por etiqueta para trazar
+            const finalData = sortedByEtiqueta;
+            
+            const n = finalData.length;
+            const yPositions = finalData.map((_, i) => n - i); // Invertir para que el más caro esté arriba
+            
+            const xLeft = 0;
+            const xRight = 1;
+            
+            const traces = [];
+            
+            finalData.forEach(m => {
+                const yLeft = n - m.rankEtiqueta + 1;
+                const yRight = n - m.rankMl + 1;
+                
+                let color, lineDash;
+                if (m.rankMl < m.rankEtiqueta) {
+                    // Sube de posición (más caro en USD/ml) → rojo
+                    color = '#dc3545';
+                    lineDash = 'solid';
+                } else if (m.rankMl > m.rankEtiqueta) {
+                    // Baja de posición (más barato en USD/ml) → verde
+                    color = '#28a745';
+                    lineDash = 'solid';
+                } else {
+                    color = '#adb5bd';
+                    lineDash = 'dot';
+                }
+                
+                // Línea conectora
+                traces.push({
+                    x: [xLeft, xRight],
+                    y: [yLeft, yRight],
+                    mode: 'lines',
+                    line: { color: color, width: 2.5, dash: lineDash },
+                    hoverinfo: 'skip',
+                    showlegend: false
+                });
+                
+                // Punto izquierdo (precio etiqueta)
+                traces.push({
+                    x: [xLeft],
+                    y: [yLeft],
+                    mode: 'markers+text',
+                    marker: { color: color, size: 12, line: { color: 'white', width: 2 } },
+                    text: [`${m.marca} ($${m.precioEtiqueta})`],
+                    textposition: 'middle left',
+                    textfont: { size: 11, color: '#333' },
+                    hovertemplate: `${m.marca}<br>Precio Etiqueta: $${m.precioEtiqueta}<br>Ranking: #${m.rankEtiqueta}<extra></extra>`,
+                    showlegend: false
+                });
+                
+                // Punto derecho (precio/ml)
+                traces.push({
+                    x: [xRight],
+                    y: [yRight],
+                    mode: 'markers+text',
+                    marker: { color: color, size: 12, line: { color: 'white', width: 2 } },
+                    text: [`${m.marca} ($${m.precioMl.toFixed(2)}/ml)`],
+                    textposition: 'middle right',
+                    textfont: { size: 11, color: '#333' },
+                    hovertemplate: `${m.marca}<br>Precio por ml: $${m.precioMl.toFixed(2)}<br>Ranking: #${m.rankMl}<extra></extra>`,
+                    showlegend: false
+                });
+            });
+            
+            // Líneas de referencia horizontales sutiles
+            for (let i = 1; i <= n; i++) {
+                traces.push({
+                    x: [xLeft - 0.02, xRight + 0.02],
+                    y: [i, i],
+                    mode: 'lines',
+                    line: { color: '#e9ecef', width: 1 },
+                    hoverinfo: 'skip',
+                    showlegend: false
+                });
+            }
+            
+            const layout = {
+                xaxis: {
+                    showgrid: false,
+                    zeroline: false,
+                    tickvals: [xLeft, xRight],
+                    ticktext: ['<b>Ranking por<br>precio de etiqueta</b>', '<b>Ranking por<br>precio real (USD/ml)</b>'],
+                    tickfont: { size: 14, color: '#333' },
+                    range: [-0.35, 1.35]
+                },
+                yaxis: {
+                    showgrid: false,
+                    zeroline: false,
+                    range: [0.5, n + 0.5],
+                    showticklabels: false
+                },
+                margin: { t: 30, b: 80, l: 200, r: 200 },
+                height: 700,
+                plot_bgcolor: '#fafafa',
+                paper_bgcolor: '#fafafa',
+                annotations: [
+                    {
+                        x: 0.5, y: -0.12,
+                        xref: 'paper', yref: 'paper',
+                        text: '🔴 Líneas rojas: la marca sube de posición (más cara de lo que parece) | 🟢 Líneas verdes: la marca baja (más barata de lo que parece)',
+                        showarrow: false,
+                        font: { size: 12, color: '#555' }
+                    }
+                ]
+            };
+            
+            Plotly.newPlot('slopeChart', traces, layout, {responsive: true, displayModeBar: false});
+        }
+        
+        buildSlopeChart();
+
+        // ============================================================
+        // FUNCIÓN TOGGLE VIEW
+        // ============================================================
+        function toggleView(view) {
+            currentView = view;
+            document.querySelectorAll('.btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (view === 'heatmap') {
+                Plotly.newPlot('mainChart', [heatmapTrace], heatmapLayout, {responsive: true});
+            } else if (view === 'bar') {
+                Plotly.newPlot('mainChart', barTraces, barLayout, {responsive: true});
+            } else if (view === 'bubble') {
+                Plotly.newPlot('mainChart', bubbleTraces, bubbleLayout, {responsive: true});
+            }
+        }
+
+        // ============================================================
+        // KPIs Y ESTADÍSTICAS
+        // ============================================================
+        function calculateStats() {
+            let maxPrecio = { pais: '', cat: '', value: 0 };
+            let minPrecio = { pais: '', cat: '', value: Infinity };
+            let maxCat = { cat: '', value: 0 };
+            let totalProducts = 0;
+            
+            paises.forEach(pais => {
+                categorias.forEach(cat => {
+                    const val = data[pais][cat].precio;
+                    totalProducts += data[pais][cat].count;
+                    if (val > maxPrecio.value) maxPrecio = { pais, cat, value: val };
+                    if (val < minPrecio.value) minPrecio = { pais, cat, value: val };
+                });
+            });
+            
+            categorias.forEach(cat => {
+                const avg = paises.reduce((sum, pais) => sum + data[pais][cat].precio, 0) / paises.length;
+                if (avg > maxCat.value) maxCat = { cat, value: avg };
+            });
+            
+            document.getElementById('mostExpensiveCountry').textContent = maxPrecio.pais;
+            document.getElementById('mostExpensiveCountryValue').textContent = `$${maxPrecio.value.toFixed(2)} (${maxPrecio.cat})`;
+            
+            document.getElementById('cheapestCountry').textContent = minPrecio.pais;
+            document.getElementById('cheapestCountryValue').textContent = `$${minPrecio.value.toFixed(2)} (${minPrecio.cat})`;
+            
+            document.getElementById('mostExpensiveCategory').textContent = maxCat.cat;
+            document.getElementById('mostExpensiveCategoryValue').textContent = `$${maxCat.value.toFixed(2)} promedio`;
+            
+            document.getElementById('totalProducts').textContent = totalProducts;
+
+            // KPIs de marcas
+            const mostExpensiveBrand = marcasData.reduce((max, m) => m.precioEtiqueta > max.precioEtiqueta ? m : max, marcasData[0]);
+            const mostExpensivePerMl = marcasData.reduce((max, m) => m.precioMl > max.precioMl ? m : max, marcasData[0]);
+            const cheapestPerMl = marcasData.reduce((min, m) => m.precioMl < min.precioMl ? m : min, marcasData[0]);
+            
+            // Mayor discrepancia
+            const sortedByEtiqueta2 = [...marcasData].sort((a, b) => b.precioEtiqueta - a.precioEtiqueta);
+            const sortedByMl2 = [...marcasData].sort((a, b) => b.precioMl - a.precioMl);
+            let biggestGap = { marca: '', gap: 0, detail: '' };
+            
+            marcasData.forEach(m => {
+                const rankE = sortedByEtiqueta2.findIndex(x => x.marca === m.marca) + 1;
+                const rankM = sortedByMl2.findIndex(x => x.marca === m.marca) + 1;
+                const gap = Math.abs(rankE - rankM);
+                if (gap > biggestGap.gap) {
+                    biggestGap = { 
+                        marca: m.marca, 
+                        gap: gap, 
+                        detail: `Ranking etiqueta: #${rankE} → Ranking real: #${rankM} (${gap} posiciones de diferencia)` 
+                    };
+                }
+            });
+            
+            document.getElementById('kpiMostExpensiveBrand').textContent = mostExpensiveBrand.marca;
+            document.getElementById('kpiMostExpensiveBrandDetail').textContent = 
+                `Precio de etiqueta: $${mostExpensiveBrand.precioEtiqueta} USD<br>Producto representativo: Sérum Advanced Night Repair`;
+            
+            document.getElementById('kpiMostExpensivePerMl').textContent = mostExpensivePerMl.marca;
+            document.getElementById('kpiMostExpensivePerMlDetail').textContent = 
+                `Costo por ml: $${mostExpensivePerMl.precioMl.toFixed(2)} USD/ml<br>⚠️ La marca más cara en términos reales de presentación`;
+            
+            document.getElementById('kpiCheapestPerMl').textContent = cheapestPerMl.marca;
+            document.getElementById('kpiCheapestPerMlDetail').textContent = 
+                `Costo por ml: $${cheapestPerMl.precioMl.toFixed(2)} USD/ml<br>✅ Mejor relación cantidad-precio`;
+            
+            document.getElementById('kpiBiggestGap').textContent = biggestGap.marca;
+            document.getElementById('kpiBiggestGapDetail').textContent = biggestGap.detail;
+
+            // Tabla de categorías
+            const catStats = [
+                { cat: 'Sérum', precio: 22.80, unit: 0.54, dispersion: 'Alta', indice: '🔴🔴' },
+                { cat: 'Protector solar', precio: 23.13, unit: 0.37, dispersion: 'Media', indice: '🔴🔴' },
+                { cat: 'Limpiador', precio: 11.31, unit: 0.03, dispersion: 'Baja', indice: '🟢' },
+                { cat: 'Cremas', precio: 15.55, unit: 0.19, dispersion: 'Media', indice: '🟡' }
+            ];
+            
+            const maxUnit = Math.max(...catStats.map(c => c.unit));
+            const tbody = document.getElementById('categoryTableBody');
+            tbody.innerHTML = '';
+            
+            catStats.forEach(c => {
+                const barWidth = (c.unit / maxUnit) * 100;
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${c.cat}</strong></td>
+                    <td>$${c.precio.toFixed(2)}</td>
+                    <td>$${c.unit.toFixed(2)} <span class="bar-inline" style="width: ${barWidth}px;"></span></td>
+                    <td>${c.dispersion}</td>
+                    <td style="font-size: 1.2em;">${c.indice}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        calculateStats();
+    </script>
+</body>
+</html>

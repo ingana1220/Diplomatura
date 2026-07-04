@@ -1,0 +1,268 @@
+nombre_producto	unidad_medida	cantidad	precio	moneda	pais	cotizacion_USD	Valor_prod_USD	USD_x_cant	categoria
+Cetaphil Moisturizing Cream	ml	250	32000	ARS	Argentina	0,000677	 21,66 	 0,09 	Cremas
+Nivea Creme Hidratante	ml	400	15,9	BRL	Brasil	0,1933	 3,07 	 0,01 	Cremas
+Neutrogena Hydro Boost Water Gel	ml	50	22,99	AUD	Australia	0,6899	 15,86 	 0,32 	Cremas
+L'Oreal Paris Revitalift Crema Día	ml	50	12,5	EUR	España	1,138	 14,23 	 0,28 	Cremas
+Simple Kind to Skin Moisturiser	ml	125	8,99	AUD	Australia	0,6899	 6,20 	 0,05 	Cremas
+La Roche-Posay Toleriane Hidratante	ml	40	29,99	AUD	Australia	0,6899	 20,69 	 0,52 	Cremas
+Dove Body Lotion Original	ml	400	1899	ARS	Argentina	0,000677	 1,29 	 0,00 	Cremas
+Eucerin Aquaphor Crema Reparadora	ml	45	9,95	EUR	España	1,138	 11,32 	 0,25 	Cremas
+Olay Regenerist Micro-Sculpting Cream	g	50	269,9	BRL	Brasil	0,1933	 52,17 	 1,04 	Cremas
+Bioderma Sensibio H2O	ml	500	18,5	EUR	España	1,138	 21,05 	 0,04 	Limpiador
+Garnier Micellar Cleansing Water	ml	400	4800	ARS	Argentina	0,000677	 3,25 	 0,01 	Limpiador
+Vaseline Intensive Care Body Lotion	ml	600	24,99	AUD	Australia	0,6899	 17,24 	 0,03 	Cremas
+Avene Eau Thermale Spring Water	ml	150	12,99	EUR	España	1,138	 14,78 	 0,10 	Cremas
+Soap & Glory Body Butter	ml	300	25,5	AUD	Australia	0,6899	 17,59 	 0,06 	Cremas
+Eucerin UreaRepair Plus Lotion	ml	250	14,99	EUR	España	1,138	 17,06 	 0,07 	Cremas
+Loreal Hydra Genius Sérum	ml	70	2599	ARS	Argentina	0,000677	 1,76 	 0,03 	Sérum
+Clean & Clear Gel de Limpeza	ml	150	18,9	BRL	Brasil	0,1933	 3,65 	 0,02 	Limpiador
+Avon Renew Clinical Retinol	ml	30	89,9	BRL	Brasil	0,1933	 17,38 	 0,58 	Sérum
+Payot Crème No2	ml	50	29,99	EUR	España	1,138	 34,13 	 0,68 	Cremas
+Ego QV Moisturising Cream	g	500	18,99	AUD	Australia	0,6899	 13,10 	 0,03 	Cremas
+Kiehl's Ultra Facial Cream	ml	125	65000	ARS	Argentina	0,000677	 44,01 	 0,35 	Cremas
+Ponds Cold Cream	g	200	49,9	BRL	Brasil	0,1933	 9,65 	 0,05 	Cremas
+Estee Lauder Advanced Night Repair	ml	30	59,99	AUD	Australia	0,6899	 41,39 	 1,38 	Sérum
+Clinique Moisture Surge	ml	75	34,5	EUR	España	1,138	 39,26 	 0,52 	Cremas
+Aloe Vera Gel Bonne Bell	ml	200	2800	ARS	Argentina	0,000677	 1,90 	 0,01 	Cremas
+Vichy Liftactiv Collagen Specialist	ml	50	25,99	EUR	España	1,138	 29,58 	 0,59 	Cremas
+Sukin Facial Moisturiser	ml	125	14,99	AUD	Australia	0,6899	 10,34 	 0,08 	Cremas
+Darrow Nupill Facial Cream	g	40	79,9	BRL	Brasil	0,1933	 15,44 	 0,39 	Cremas
+Dove Crema Corporal Original	ml	250	3800	ARS	Argentina	0,000677	 2,57 	 0,01 	Cremas
+ROC Retinol Correxion	ml	30	14,99	EUR	España	1,138	 17,06 	 0,57 	Sérum
+Thursday Plantation Tea Tree Face Wash	ml	200	12,99	AUD	Australia	0,6899	 8,96 	 0,04 	Limpiador
+Neutrogena Clean & Clear Gel	ml	80	29,9	BRL	Brasil	0,1933	 5,78 	 0,07 	Limpiador
+Isdin Ureadin Lotion	ml	400	16,5	EUR	España	1,138	 18,78 	 0,05 	Cremas
+Fotoprotector ISDIN SPF50+	ml	50	18	EUR	España	1,138	 20,48 	 0,41 	Protector solar
+Banana Boat Sunscreen Lotion	ml	240	15,99	AUD	Australia	0,6899	 11,03 	 0,05 	Protector solar
+L'Bel Hydractiv 360	ml	60	18000	ARS	Argentina	0,000677	 12,19 	 0,20 	Cremas
+Nívea Protetor Solar FPS50	ml	200	39,9	BRL	Brasil	0,1933	 7,71 	 0,04 	Protector solar
+Cerave Facial Moisturizing Lotion	ml	52	21000	ARS	Argentina	0,000677	 14,22 	 0,27 	Cremas
+Bioderma ABCDerm Babysquam	g	40	8,99	EUR	España	1,138	 10,23 	 0,26 	Cremas
+Cancer Council Sunscreen SPF50+	ml	500	18,99	AUD	Australia	0,6899	 13,10 	 0,03 	Protector solar
+Natura Tododia Hidratante Corporal	ml	200	34,9	BRL	Brasil	0,1933	 6,75 	 0,03 	Cremas
+Johnsons Baby Lotion Clasica	ml	200	4500	ARS	Argentina	0,000677	 3,05 	 0,02 	Cremas
+Hinds Crema Clasica	ml	250	3200	ARS	Argentina	0,000677	 2,17 	 0,01 	Cremas
+Nivea Creme Lata Azul	ml	150	1599	ARS	Argentina	0,000677	 1,08 	 0,01 	Cremas
+Pond's Crema Humectante	g	200	1499	ARS	Argentina	0,000677	 1,01 	 0,01 	Cremas
+St. Ives Crema Corporal Avena	ml	400	2199	ARS	Argentina	0,000677	 1,49 	 0,00 	Cremas
+Neutrogena Hydro Boost Aqua Gel	ml	50	4899	ARS	Argentina	0,000677	 3,32 	 0,07 	Cremas
+La Roche-Posay Effaclar Gel	ml	200	48000	ARS	Argentina	0,000677	 32,50 	 0,16 	Limpiador
+Bioderma Micellar Solution Argentina	ml	500	42000	ARS	Argentina	0,000677	 28,43 	 0,06 	Limpiador
+Yanbal Genesis Crema Reafirmante	ml	200	3800	ARS	Argentina	0,000677	 2,57 	 0,01 	Cremas
+Farmacias Similares Crema Hidratante	g	100	7500	ARS	Argentina	0,000677	 5,08 	 0,05 	Cremas
+Revlon Age Defying Crema	ml	50	3200	ARS	Argentina	0,000677	 2,17 	 0,04 	Cremas
+Cicatricure Crema Facial Antiage	g	50	2799	ARS	Argentina	0,000677	 1,89 	 0,04 	Cremas
+Natura Chronos Hidratante 40+	ml	40	89,9	BRL	Brasil	0,1933	 17,38 	 0,43 	Cremas
+O Boticario Nativa SPA Oleo Corporal	ml	200	79,9	BRL	Brasil	0,1933	 15,44 	 0,08 	Cremas
+Vult Gel Hidratante Facial	ml	30	29,9	BRL	Brasil	0,1933	 5,78 	 0,19 	Cremas
+Nívea Hidratante Milk	ml	200	32,9	BRL	Brasil	0,1933	 6,36 	 0,03 	Cremas
+L'Oreal Paris Revitalift Laser	ml	50	159,9	BRL	Brasil	0,1933	 30,91 	 0,62 	Sérum
+Dermage Lipossolúvel Creme	g	60	129	BRL	Brasil	0,1933	 24,94 	 0,42 	Cremas
+Episol FPS70 Loção Solar	ml	120	64,9	BRL	Brasil	0,1933	 12,55 	 0,10 	Protector solar
+Cetaphil Loção Hidratante	ml	473	89,9	BRL	Brasil	0,1933	 17,38 	 0,04 	Cremas
+Eucerin pH5 Loção Hidratante	ml	250	69,9	BRL	Brasil	0,1933	 13,51 	 0,05 	Cremas
+Vichy Aqualia Thermal Creme	ml	50	149	BRL	Brasil	0,1933	 28,80 	 0,58 	Cremas
+Skala Expert Máscara Capilar	g	500	12,9	BRL	Brasil	0,1933	 2,49 	 0,00 	Cremas
+Fotoprotector Minesol FPS60	ml	120	49,9	BRL	Brasil	0,1933	 9,65 	 0,08 	Protector solar
+Mercadona Deliplus Crema Hidratante	ml	300	3,95	EUR	España	1,138	 4,50 	 0,01 	Cremas
+Sesderma Acglicolic Liposomed Cream	ml	50	32	EUR	España	1,138	 36,42 	 0,73 	Sérum
+Uriage Bariéderm Insulating Cream	ml	40	13,9	EUR	España	1,138	 15,82 	 0,40 	Cremas
+Martiderm Proteos Mask	ml	30	25	EUR	España	1,138	 28,45 	 0,95 	Sérum
+La Roche-Posay Cicaplast Baume B5	ml	40	13,5	EUR	España	1,138	 15,36 	 0,38 	Cremas
+Leti AT4 Crema Atópica	ml	200	18,5	EUR	España	1,138	 21,05 	 0,11 	Cremas
+Sensilis Upgrade Crema Antiedad	ml	50	49,95	EUR	España	1,138	 56,84 	 1,14 	Cremas
+Nivea Soft Crema Hidratante	ml	200	3,99	EUR	España	1,138	 4,54 	 0,02 	Cremas
+Neutrogena Norwegian Formula Crema	ml	75	8,99	EUR	España	1,138	 10,23 	 0,14 	Cremas
+Weleda Skin Food Crema	ml	30	9,95	EUR	España	1,138	 11,32 	 0,38 	Cremas
+SVR Topialyse Crema Barrera	ml	200	16,9	EUR	España	1,138	 19,23 	 0,10 	Cremas
+Avène Crème Légère Hydratante	ml	40	11,9	EUR	España	1,138	 13,54 	 0,34 	Cremas
+Germinal 3.0 Acción Inmediata Sérum	ml	30	36	EUR	España	1,138	 40,97 	 1,37 	Sérum
+Heliocare 360 Gel Oil-Free SPF50	ml	50	22,8	EUR	España	1,138	 25,95 	 0,52 	Protector solar
+Endocare Cellage Firming Cream	ml	50	62,5	EUR	España	1,138	 71,13 	 1,42 	Sérum
+Aveeno Daily Moisturising Lotion	ml	354	14,99	AUD	Australia	0,6899	 10,34 	 0,03 	Cremas
+Cetaphil Daily Facial Cleanser	ml	235	17,99	AUD	Australia	0,6899	 12,41 	 0,05 	Limpiador
+Neutrogena Rapid Wrinkle Repair Serum	ml	30	39,99	AUD	Australia	0,6899	 27,59 	 0,92 	Sérum
+Priceline Vitamin C Serum	ml	30	12,99	AUD	Australia	0,6899	 8,96 	 0,30 	Sérum
+La Roche-Posay Anthelios SPF50+	ml	50	29,99	AUD	Australia	0,6899	 20,69 	 0,41 	Protector solar
+Biore UV Aqua Rich SPF50 Australia	ml	50	19,99	AUD	Australia	0,6899	 13,79 	 0,28 	Protector solar
+Innisfree Green Tea Seed Serum	ml	80	32	AUD	Australia	0,6899	 22,08 	 0,28 	Sérum
+The Ordinary Hyaluronic Acid 2pct B5	ml	30	12,99	AUD	Australia	0,6899	 8,96 	 0,30 	Sérum
+Dermaveen Daily Nourish Lotion	ml	500	18,99	AUD	Australia	0,6899	 13,10 	 0,03 	Cremas
+Hamilton Everyday Moisturising Lotion	ml	500	14,99	AUD	Australia	0,6899	 10,34 	 0,02 	Cremas
+Nivea Soft Refreshingly Soft Cream AU	ml	200	8,99	AUD	Australia	0,6899	 6,20 	 0,03 	Cremas
+CeraVe Moisturising Cream Australia	ml	340	29,99	AUD	Australia	0,6899	 20,69 	 0,06 	Cremas
+Ultraceuticals Ultra UV SPF50	ml	50	65	AUD	Australia	0,6899	 44,84 	 0,90 	Protector solar
+Bioderma Sensibio Micellar Water AU	ml	500	24,99	AUD	Australia	0,6899	 17,24 	 0,03 	Limpiador
+Nivea Creme Boite Bleue	ml	150	5,99	EUR	Francia	1,138	 6,82 	 0,05 	Cremas
+Nivea Body Lotion Karite	ml	400	6,49	EUR	Francia	1,138	 7,39 	 0,02 	Cremas
+L'Oreal Paris Revitalift Crème de Jour	ml	50	14,9	EUR	Francia	1,138	 16,96 	 0,34 	Cremas
+L'Oreal Paris Hydra Genius Gel	ml	70	16,9	EUR	Francia	1,138	 19,23 	 0,27 	Sérum
+Garnier Eau Micellaire Tout-en-1	ml	400	5,99	EUR	Francia	1,138	 6,82 	 0,02 	Limpiador
+Garnier Skin Active Crème Hydratante	ml	50	8,9	EUR	Francia	1,138	 10,13 	 0,20 	Cremas
+Bioderma Sensibio H2O Micellaire	ml	500	14,9	EUR	Francia	1,138	 16,96 	 0,03 	Limpiador
+Bioderma Atoderm Crème Corps	ml	200	12,5	EUR	Francia	1,138	 14,23 	 0,07 	Cremas
+Vichy Normaderm Phytosolution Crème	ml	50	16,9	EUR	Francia	1,138	 19,23 	 0,38 	Cremas
+Vichy Mineral 89 Sérum Booster	ml	50	19,9	EUR	Francia	1,138	 22,65 	 0,45 	Sérum
+La Roche-Posay Toleriane Fluide	ml	40	13,5	EUR	Francia	1,138	 15,36 	 0,38 	Cremas
+La Roche-Posay Anthelios SPF50+ Fluide	ml	50	20,5	EUR	Francia	1,138	 23,33 	 0,47 	Protector solar
+Avène Crème Légère Apaisante	ml	40	11,9	EUR	Francia	1,138	 13,54 	 0,34 	Cremas
+Avène Eau Thermale Spray	ml	150	8,5	EUR	Francia	1,138	 9,67 	 0,06 	Cremas
+Neutrogena Hydro Boost Gel-Crème	ml	50	13,99	EUR	Francia	1,138	 15,92 	 0,32 	Cremas
+Neutrogena Norwegian Formula Crème Mains	ml	75	6,99	EUR	Francia	1,138	 7,95 	 0,11 	Cremas
+Dove Lotion Corporelle Hydratation Intense	ml	400	5,49	EUR	Francia	1,138	 6,25 	 0,02 	Cremas
+Cetaphil Crème Hydratante Visage Corps	ml	250	12,9	EUR	Francia	1,138	 14,68 	 0,06 	Cremas
+Eucerin pH5 Lotion Hydratante	ml	250	9,99	EUR	Francia	1,138	 11,37 	 0,05 	Cremas
+Eucerin Aquaphor Soin Réparateur	ml	45	10,5	EUR	Francia	1,138	 11,95 	 0,27 	Cremas
+Weleda Skin Food Crème Nourrissante	ml	30	7,9	EUR	Francia	1,138	 8,99 	 0,30 	Cremas
+Payot Crème No.2 Cachemire	ml	50	35	EUR	Francia	1,138	 39,83 	 0,80 	Cremas
+Clinique Moisture Surge 100H	ml	75	39	EUR	Francia	1,138	 44,38 	 0,59 	Cremas
+The Ordinary Hyaluronic Acid 2pct B5 FR	ml	30	8,9	EUR	Francia	1,138	 10,13 	 0,34 	Sérum
+Uriage Eau Thermale Crème Légère	ml	40	12,5	EUR	Francia	1,138	 14,23 	 0,36 	Cremas
+L'Oreal Paris Revitalift Crema Dia AR	ml	50	3499	ARS	Argentina	0,000677	 2,37 	 0,05 	Cremas
+Garnier Skin Active Agua Micelar AR	ml	400	1850	ARS	Argentina	0,000677	 1,25 	 0,00 	Limpiador
+Bioderma Atoderm Crema Corporal	ml	200	38000	ARS	Argentina	0,000677	 25,73 	 0,13 	Cremas
+Vichy Mineral 89 Serum 50ml	ml	50	55000	ARS	Argentina	0,000677	 37,24 	 0,74 	Sérum
+La Roche-Posay Anthelios SPF50+ Fluido 50ml	ml	50	58000	ARS	Argentina	0,000677	 39,27 	 0,79 	Protector solar
+Eucerin pH5 Locion Hidratante AR	ml	250	3800	ARS	Argentina	0,000677	 2,57 	 0,01 	Cremas
+Neutrogena Norwegian Formula Crema Manos	ml	75	1250	ARS	Argentina	0,000677	 0,85 	 0,01 	Cremas
+Dove Locion Corporal Hidratacion AR	ml	400	1899	ARS	Argentina	0,000677	 1,29 	 0,00 	Cremas
+The Ordinary Hialuronico 2pct B5 AR	ml	30	1890	ARS	Argentina	0,000677	 1,28 	 0,04 	Sérum
+Weleda Skin Food Crema Nutritiva AR	ml	30	2800	ARS	Argentina	0,000677	 1,90 	 0,06 	Cremas
+Clinique Moisture Surge 100H AR	ml	75	95000	ARS	Argentina	0,000677	 64,32 	 0,86 	Cremas
+Payot Creme No2 Cachemire AR	ml	50	85000	ARS	Argentina	0,000677	 57,55 	 1,15 	Otro / Sin clasificar
+Olay Total Effects 7en1 Crema Dia	g	50	3200	ARS	Argentina	0,000677	 2,17 	 0,04 	Cremas
+Avene Crema Ligera Calmante AR	ml	40	4200	ARS	Argentina	0,000677	 2,84 	 0,07 	Cremas
+Nivea Creme Lata Azul BR	ml	150	22,9	BRL	Brasil	0,1933	 4,43 	 0,03 	Cremas
+L'Oreal Paris Revitalift Gel-Creme BR	ml	50	119,9	BRL	Brasil	0,1933	 23,18 	 0,46 	Cremas
+Garnier Micellar Water BR	ml	400	34,9	BRL	Brasil	0,1933	 6,75 	 0,02 	Limpiador
+Bioderma Sensibio H2O BR	ml	500	89,9	BRL	Brasil	0,1933	 17,38 	 0,03 	Limpiador
+Vichy Mineral 89 Serum BR	ml	50	159,9	BRL	Brasil	0,1933	 30,91 	 0,62 	Sérum
+La Roche-Posay Anthelios XL SPF70	ml	120	99,9	BRL	Brasil	0,1933	 19,31 	 0,16 	Protector solar
+Eucerin Urea Repair Plus Locao	ml	250	79,9	BRL	Brasil	0,1933	 15,44 	 0,06 	Otro / Sin clasificar
+Neutrogena Hydro Boost Gel de Agua	ml	50	84,9	BRL	Brasil	0,1933	 16,41 	 0,33 	Cremas
+Dove Hidratante Corporal Amendoas	ml	400	29,9	BRL	Brasil	0,1933	 5,78 	 0,01 	Cremas
+Cetaphil Locao Hidratante Diaria	ml	250	64,9	BRL	Brasil	0,1933	 12,55 	 0,05 	Cremas
+The Ordinary Acido Hialuronico 2pct BR	ml	30	45,9	BRL	Brasil	0,1933	 8,87 	 0,30 	Sérum
+Olay Total Effects 7 em 1 BR	g	50	129,9	BRL	Brasil	0,1933	 25,11 	 0,50 	Otro / Sin clasificar
+Payot Creme No.2 BR	ml	50	199	BRL	Brasil	0,1933	 38,47 	 0,77 	Otro / Sin clasificar
+Weleda Skin Food Creme Nutritivo BR	ml	30	89,9	BRL	Brasil	0,1933	 17,38 	 0,58 	Cremas
+Avene Creme Legere Apaisante BR	ml	40	89,9	BRL	Brasil	0,1933	 17,38 	 0,43 	Otro / Sin clasificar
+Nivea Creme Lata Azul ES	ml	150	5,49	EUR	España	1,138	 6,25 	 0,04 	Cremas
+L'Oreal Paris Revitalift Anti-Arrugas	ml	50	13,99	EUR	España	1,138	 15,92 	 0,32 	Otro / Sin clasificar
+Garnier Skin Active Agua Micelar 3en1	ml	400	6,99	EUR	España	1,138	 7,95 	 0,02 	Limpiador
+Vichy Mineral 89 Serum Hidratante	ml	50	19,9	EUR	España	1,138	 22,65 	 0,45 	Sérum
+Eucerin pH5 Locion Hidratante ES	ml	250	10,99	EUR	España	1,138	 12,51 	 0,05 	Cremas
+Neutrogena Hydro Boost Gel-Crema ES	ml	50	13,99	EUR	España	1,138	 15,92 	 0,32 	Cremas
+Dove Locion Corporal Nutricion Intensa	ml	400	5,49	EUR	España	1,138	 6,25 	 0,02 	Cremas
+Cetaphil Crema Hidratante ES	ml	250	12,9	EUR	España	1,138	 14,68 	 0,06 	Cremas
+The Ordinary Hialuronico 2pct B5 ES	ml	30	9,5	EUR	España	1,138	 10,81 	 0,36 	Sérum
+Olay Total Effects 7 en 1 Crema Dia	g	50	14,99	EUR	España	1,138	 17,06 	 0,34 	Cremas
+Weleda Skin Food Crema Nutritiva ES	ml	30	9,95	EUR	España	1,138	 11,32 	 0,38 	Cremas
+Clinique Moisture Surge 100H ES	ml	75	39,9	EUR	España	1,138	 45,41 	 0,61 	Cremas
+Bioderma Atoderm Creme Corps ES	ml	200	13,5	EUR	España	1,138	 15,36 	 0,08 	Otro / Sin clasificar
+Nivea Creme Moisturising Cream AU	ml	150	8,99	AUD	Australia	0,6899	 6,20 	 0,04 	Cremas
+L'Oreal Paris Revitalift Day Cream AU	ml	50	24,99	AUD	Australia	0,6899	 17,24 	 0,34 	Cremas
+Garnier Micellar Cleansing Water AU	ml	400	10,99	AUD	Australia	0,6899	 7,58 	 0,02 	Limpiador
+Bioderma Sensibio H2O AU	ml	500	29,99	AUD	Australia	0,6899	 20,69 	 0,04 	Limpiador
+Vichy Mineral 89 Serum AU	ml	50	44,99	AUD	Australia	0,6899	 31,04 	 0,62 	Sérum
+Eucerin pH5 Moisturising Lotion AU	ml	250	24,99	AUD	Australia	0,6899	 17,24 	 0,07 	Cremas
+Dove Body Lotion Intensive Nourishment AU	ml	400	10	AUD	Australia	0,6899	 6,90 	 0,02 	Cremas
+Cetaphil Moisturising Lotion AU	ml	250	19,99	AUD	Australia	0,6899	 13,79 	 0,06 	Cremas
+The Ordinary Hyaluronic Acid 2pct B5 AU	ml	30	14,99	AUD	Australia	0,6899	 10,34 	 0,34 	Sérum
+Olay Total Effects 7-in-1 Day Cream AU	g	50	29,99	AUD	Australia	0,6899	 20,69 	 0,41 	Cremas
+Clinique Moisture Surge 100H AU	ml	75	64	AUD	Australia	0,6899	 44,15 	 0,59 	Cremas
+Weleda Skin Food Original AU	ml	30	16,99	AUD	Australia	0,6899	 11,72 	 0,39 	Cremas
+Avene Soothing Light Cream AU	ml	40	29,99	AUD	Australia	0,6899	 20,69 	 0,52 	Cremas
+Neutrogena Hydro Boost Water Cream AU	ml	50	24,99	AUD	Australia	0,6899	 17,24 	 0,34 	Cremas
+Avene Thermal Spring Water Spray AU	ml	150	14,99	AUD	Australia	0,6899	 10,34 	 0,07 	Cremas
+Avène Crème Légère Apaisante 40ml FR	ml	40	9,9	EUR	Francia	1,138	 11,27 	 0,28 	Cremas
+Avène Crème Légère Apaisante 150ml FR	ml	150	18,5	EUR	Francia	1,138	 21,05 	 0,14 	Cremas
+Avène Crème Légère Apaisante 40ml ES	ml	40	11,9	EUR	España	1,138	 13,54 	 0,34 	Cremas
+Avène Crema Ligera Calmante 150ml AR	ml	150	22000	ARS	Argentina	0,000677	 14,89 	 0,10 	Cremas
+Avène Crema Ligera Calmante 150ml BR	ml	150	129,9	BRL	Brasil	0,1933	 25,11 	 0,17 	Cremas
+Avène Thermal Spring Water Spray 150ml AR	ml	150	15000	ARS	Argentina	0,000677	 10,16 	 0,07 	Cremas
+Avène Thermal Spring Water Spray 150ml BR	ml	150	69,9	BRL	Brasil	0,1933	 13,51 	 0,09 	Cremas
+Avène Eau Thermale Spray 150ml ES	ml	150	12,99	EUR	España	1,138	 14,78 	 0,10 	Cremas
+Olay Total Effects 7-en-1 Crème Jour FR	g	50	19,9	EUR	Francia	1,138	 22,65 	 0,45 	Cremas
+Olay Regenerist Micro-Sculpting Cream AR	g	50	38000	ARS	Argentina	0,000677	 25,73 	 0,51 	Cremas
+Olay Regenerist Micro-Sculpting Cream AU	g	50	34,99	AUD	Australia	0,6899	 24,14 	 0,48 	Cremas
+Olay Regenerist Micro-Sculpting Cream ES	g	50	18,99	EUR	España	1,138	 21,61 	 0,43 	Cremas
+Olay Regenerist Micro-Sculpting Crème FR	g	50	19,9	EUR	Francia	1,138	 22,65 	 0,45 	Cremas
+Clinique Moisture Surge 100H 75ml BR	ml	75	249	BRL	Brasil	0,1933	 48,13 	 0,64 	Cremas
+Payot Crème No.2 Cachemire 50ml AU	ml	50	59,99	AUD	Australia	0,6899	 41,39 	 0,83 	Cremas
+Dove Body Lotion Nourishing 250ml AU	ml	250	7,99	AUD	Australia	0,6899	 5,51 	 0,02 	Cremas
+Dove Hidratante Corporal 250ml BR	ml	250	19,9	BRL	Brasil	0,1933	 3,85 	 0,02 	Cremas
+Dove Locion Corporal 250ml ES	ml	250	3,99	EUR	España	1,138	 4,54 	 0,02 	Cremas
+Dove Lotion Corporelle 250ml FR	ml	250	3,99	EUR	Francia	1,138	 4,54 	 0,02 	Cremas
+Garnier Skin Active Crema Facial 50ml AR	ml	50	5200	ARS	Argentina	0,000677	 3,52 	 0,07 	Cremas
+Garnier Skin Active Hydrating Cream 50ml AU	ml	50	9,99	AUD	Australia	0,6899	 6,89 	 0,14 	Cremas
+Garnier Skin Active Crema Hidratante 50ml BR	ml	50	24,9	BRL	Brasil	0,1933	 4,81 	 0,10 	Cremas
+Garnier Skin Active Crème Essentielle 50ml ES	ml	50	7,99	EUR	España	1,138	 9,09 	 0,18 	Cremas
+Nivea Soft Crema Hidratante 200ml AR	ml	200	6500	ARS	Argentina	0,000677	 4,40 	 0,02 	Cremas
+Nivea Soft Crème Hydratante 200ml FR	ml	200	4,49	EUR	Francia	1,138	 5,11 	 0,03 	Cremas
+Nivea Body Locion 400ml AR	ml	400	8500	ARS	Argentina	0,000677	 5,75 	 0,01 	Cremas
+Eucerin Aquaphor Soin Réparateur 45ml AR	ml	45	14500	ARS	Argentina	0,000677	 9,82 	 0,22 	Cremas
+Eucerin Aquaphor Repairing Ointment 45ml AU	ml	45	12,99	AUD	Australia	0,6899	 8,96 	 0,20 	Cremas
+Eucerin Aquaphor Pomada Reparadora 45ml BR	ml	45	49,9	BRL	Brasil	0,1933	 9,65 	 0,21 	Cremas
+La Roche-Posay Toleriane Fluide 40ml BR	ml	40	69,9	BRL	Brasil	0,1933	 13,51 	 0,34 	Cremas
+La Roche-Posay Toleriane Fluide 40ml ES	ml	40	13,5	EUR	España	1,138	 15,36 	 0,38 	Cremas
+La Roche-Posay Anthelios SPF50+ 120ml AR	ml	120	45000	ARS	Argentina	0,000677	 30,47 	 0,25 	Protector solar
+La Roche-Posay Anthelios SPF50+ 120ml AU	ml	120	52,99	AUD	Australia	0,6899	 36,56 	 0,30 	Protector solar
+La Roche-Posay Anthelios SPF50+ 120ml ES	ml	120	22,5	EUR	España	1,138	 25,61 	 0,21 	Protector solar
+La Roche-Posay Anthelios SPF50+ 120ml FR	ml	120	23	EUR	Francia	1,138	 26,17 	 0,22 	Protector solar
+Neutrogena Body Lotion Norweg. 200ml AR	ml	200	12000	ARS	Argentina	0,000677	 8,12 	 0,04 	Cremas
+Neutrogena Body Lotion Norweg. 200ml AU	ml	200	16,99	AUD	Australia	0,6899	 11,72 	 0,06 	Cremas
+Neutrogena Body Lotion Norweg. 200ml ES	ml	200	10,99	EUR	España	1,138	 12,51 	 0,06 	Cremas
+Neutrogena Body Lotion Norweg. 200ml FR	ml	200	10,99	EUR	Francia	1,138	 12,51 	 0,06 	Cremas
+The Ordinary HA 2pct B5 100ml AR	ml	100	24000	ARS	Argentina	0,000677	 16,25 	 0,16 	Sérum
+The Ordinary HA 2pct B5 100ml AU	ml	100	39,99	AUD	Australia	0,6899	 27,59 	 0,28 	Sérum
+The Ordinary HA 2pct B5 100ml BR	ml	100	129,9	BRL	Brasil	0,1933	 25,11 	 0,25 	Sérum
+The Ordinary HA 2pct B5 100ml ES	ml	100	24,9	EUR	España	1,138	 28,34 	 0,28 	Sérum
+The Ordinary HA 2pct B5 100ml FR	ml	100	22,9	EUR	Francia	1,138	 26,06 	 0,26 	Sérum
+Vichy Mineral 89 Serum 30ml AR	ml	30	32000	ARS	Argentina	0,000677	 21,66 	 0,72 	Sérum
+Vichy Mineral 89 Serum 30ml AU	ml	30	27,99	AUD	Australia	0,6899	 19,31 	 0,64 	Sérum
+Vichy Mineral 89 Serum 30ml BR	ml	30	99,9	BRL	Brasil	0,1933	 19,31 	 0,64 	Sérum
+Vichy Mineral 89 Serum 30ml ES	ml	30	13,5	EUR	España	1,138	 15,36 	 0,51 	Sérum
+Vichy Mineral 89 Sérum 30ml FR	ml	30	13,5	EUR	Francia	1,138	 15,36 	 0,51 	Sérum
+Bioderma Sensibio H2O 100ml AR	ml	100	9500	ARS	Argentina	0,000677	 6,43 	 0,06 	Limpiador
+Bioderma Sensibio H2O 100ml AU	ml	100	8,99	AUD	Australia	0,6899	 6,20 	 0,06 	Limpiador
+Bioderma Sensibio H2O 100ml BR	ml	100	29,9	BRL	Brasil	0,1933	 5,78 	 0,06 	Limpiador
+Bioderma Sensibio H2O 100ml ES	ml	100	5,9	EUR	España	1,138	 6,71 	 0,07 	Limpiador
+Bioderma Sensibio H2O 100ml FR	ml	100	5,5	EUR	Francia	1,138	 6,26 	 0,06 	Limpiador
+CeraVe Moisturising Cream 340ml BR	ml	340	119,9	BRL	Brasil	0,1933	 23,18 	 0,07 	Cremas
+CeraVe Moisturising Cream 340ml ES	ml	340	16,99	EUR	España	1,138	 19,33 	 0,06 	Cremas
+CeraVe Crème Hydratante 340ml FR	ml	340	17,5	EUR	Francia	1,138	 19,92 	 0,06 	Cremas
+CeraVe Moisturising Lotion 177ml AR	ml	177	22000	ARS	Argentina	0,000677	 14,89 	 0,08 	Cremas
+CeraVe Moisturising Cream 177ml AU	ml	177	16,99	AUD	Australia	0,6899	 11,72 	 0,07 	Cremas
+Estee Lauder Advanced Night Repair 30ml AR	ml	30	195000	ARS	Argentina	0,000677	 132,02 	 4,40 	Sérum
+Estee Lauder Advanced Night Repair 30ml BR	ml	30	399	BRL	Brasil	0,1933	 77,13 	 2,57 	Sérum
+Estee Lauder Advanced Night Repair 30ml ES	ml	30	75	EUR	España	1,138	 85,35 	 2,85 	Sérum
+Estee Lauder Advanced Night Repair 30ml FR	ml	30	79	EUR	Francia	1,138	 89,90 	 3,00 	Sérum
+Vaseline Intensive Care Lotion 600ml AR	ml	600	9500	ARS	Argentina	0,000677	 6,43 	 0,01 	Cremas
+Vaseline Intensive Care Lotion 600ml BR	ml	600	49,9	BRL	Brasil	0,1933	 9,65 	 0,02 	Cremas
+Vaseline Intensive Care Lotion 600ml ES	ml	600	7,99	EUR	España	1,138	 9,09 	 0,02 	Cremas
+Vaseline Intensive Care Lotion 600ml FR	ml	600	7,49	EUR	Francia	1,138	 8,52 	 0,01 	Cremas
+Uriage Eau Thermale Crème Légère 40ml AR	ml	40	16000	ARS	Argentina	0,000677	 10,83 	 0,27 	Cremas
+Uriage Eau Thermale Cream 40ml AU	ml	40	21,99	AUD	Australia	0,6899	 15,17 	 0,38 	Cremas
+Uriage Bariéderm Crème 40ml BR	ml	40	59,9	BRL	Brasil	0,1933	 11,58 	 0,29 	Cremas
+Pond's Cold Cream 50g AU	g	50	8,99	AUD	Australia	0,6899	 6,20 	 0,12 	Cremas
+Pond's Cold Cream 50g ES	g	50	4,99	EUR	España	1,138	 5,68 	 0,11 	Cremas
+Pond's Cold Cream Démaquillante 50g FR	g	50	4,5	EUR	Francia	1,138	 5,12 	 0,10 	Cremas
+Weleda Skin Food 75ml AR	ml	75	22000	ARS	Argentina	0,000677	 14,89 	 0,20 	Cremas
+Weleda Skin Food 75ml AU	ml	75	29,99	AUD	Australia	0,6899	 20,69 	 0,28 	Cremas
+Weleda Skin Food 75ml BR	ml	75	149,9	BRL	Brasil	0,1933	 28,98 	 0,39 	Cremas
+Weleda Skin Food 75ml ES	ml	75	14,5	EUR	España	1,138	 16,50 	 0,22 	Cremas
+Weleda Skin Food 75ml FR	ml	75	13,5	EUR	Francia	1,138	 15,36 	 0,20 	Cremas
+Cetaphil Moisturising Cream 500g AR	g	500	45000	ARS	Argentina	0,000677	 30,47 	 0,06 	Cremas
+Cetaphil Moisturising Cream 500g AU	g	500	35,99	AUD	Australia	0,6899	 24,83 	 0,05 	Cremas
+Cetaphil Creme Hidratante 500g BR	g	500	159,9	BRL	Brasil	0,1933	 30,91 	 0,06 	Cremas
+Cetaphil Crema Hidratante 500g ES	g	500	24,9	EUR	España	1,138	 28,34 	 0,06 	Cremas
+Cetaphil Crème Hydratante 500g FR	g	500	24,9	EUR	Francia	1,138	 28,34 	 0,06 	Cremas
+Johnsons Baby Lotion 200ml AU	ml	200	5,99	AUD	Australia	0,6899	 4,13 	 0,02 	Cremas
+Johnsons Baby Lotion 200ml BR	ml	200	19,9	BRL	Brasil	0,1933	 3,85 	 0,02 	Cremas
+Johnsons Baby Lotion 200ml ES	ml	200	5,49	EUR	España	1,138	 6,25 	 0,03 	Cremas
+Johnsons Baby Lotion 200ml FR	ml	200	4,99	EUR	Francia	1,138	 5,68 	 0,03 	Cremas
+ROC Retinol Correxion 30ml BR	ml	30	129,9	BRL	Brasil	0,1933	 25,11 	 0,84 	Sérum
+ROC Retinol Correxion 30ml AU	ml	30	24,99	AUD	Australia	0,6899	 17,24 	 0,57 	Sérum
+ROC Retinol Correxion 30ml FR	ml	30	19,9	EUR	Francia	1,138	 22,65 	 0,75 	Sérum
+ROC Retinol Correxion 30ml AR	ml	30	28000	ARS	Argentina	0,000677	 18,96 	 0,63 	Sérum
