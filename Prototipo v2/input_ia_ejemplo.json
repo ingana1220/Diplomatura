@@ -1,0 +1,13 @@
+{
+  "categoria_nueva": "Skincare",
+  "ml_nuevo": 75,
+  "prediccion_base": {
+    "precio_ars": 0,
+    "rango_ars": [
+      0,
+      0
+    ],
+    "confianza": "MEDIA"
+  },
+  "comparables": []
+}

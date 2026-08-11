@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Inteligencia de Precio — Lanzamiento de producto</title>
+<style>
+:root{--green:#dff3e4;--greenb:#78b88a;--blue:#e1ecf8;--blueb:#6d9bc8;--burg:#e8d4d8;--burgb:#8b4a56;--ink:#26353e;--muted:#68757d;--bg:#f5f8f9}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Segoe UI,Arial,sans-serif;color:var(--ink)}
+.wrap{max-width:1180px;margin:auto;padding:28px 20px 50px}h1{margin:0;font-size:29px}.sub{color:var(--muted);margin:7px 0 22px}
+.panel{background:white;border-radius:16px;padding:20px;margin:14px 0;box-shadow:0 6px 24px #0000000d}
+.form{display:grid;grid-template-columns:1fr 1fr auto;gap:14px;align-items:end}
+label{font-weight:700;font-size:13px;display:block;margin-bottom:6px}select,input{width:100%;padding:12px;border:1px solid #ccd6db;border-radius:9px;background:white;font-size:15px}
+button{border:0;border-radius:9px;padding:12px 18px;background:var(--ink);color:white;font-weight:700;cursor:pointer}
+.result{display:grid;grid-template-columns:1.1fr 1fr;gap:18px}.price{background:var(--green);border:2px solid var(--greenb);border-radius:14px;padding:20px}
+.price .big{font-size:40px;font-weight:800;color:#285c39}.range{font-size:15px;margin-top:4px}
+.meta{background:var(--blue);border:2px solid var(--blueb);border-radius:14px;padding:18px}
+table{width:100%;border-collapse:collapse}th,td{padding:9px;border-bottom:1px solid #e6eaec;text-align:left;font-size:13px}th{background:#eef3f5}
+.badge{display:inline-block;padding:4px 7px;border-radius:7px;background:var(--burg);color:#632b35}
+textarea{width:100%;min-height:300px;border:1px solid #ccd6db;border-radius:10px;padding:12px;font-family:monospace;font-size:12px}
+.note{font-size:12px;color:var(--muted);line-height:1.5}.error{color:#8b4a56;font-weight:700}
+@media(max-width:720px){.form,.result{grid-template-columns:1fr}.wrap{padding:20px 12px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Inteligencia de Precios — Lanzamiento de producto</h1>
+<p class="sub">Estimación de precio inicial basada en productos comparables de la categoría seleccionada.</p>
+
+<section class="panel">
+<h2>1. Definir nuevo producto</h2>
+<div class="form">
+<div><label for="cat">Categoría del producto</label><select id="cat"></select></div>
+<div><label for="ml">Contenido neto (ml)</label><input id="ml" type="number" min="1" step="1" placeholder="Ej.: 75"></div>
+<button onclick="predict()">Estimar precio</button>
+</div>
+<p class="note">Las categorías se cargan automáticamente desde el campo <b>categoria</b> del dataset. El ejemplo incluido es sintético; reemplazá <code>datos_demo.json</code> por el dataset real para la entrega.</p>
+</section>
+
+<section class="panel" id="out" style="display:none">
+<h2>2. Predicción de precio inicial</h2>
+<div class="result">
+<div class="price"><div>Precio sugerido de lanzamiento</div><div class="big" id="pred"></div><div class="range" id="range"></div></div>
+<div class="meta" id="explain"></div>
+</div>
+</section>
+
+<section class="panel" id="comparables" style="display:none">
+<h2>3. Productos comparables utilizados</h2>
+<table><thead><tr><th>Producto</th><th>ML</th><th>Precio</th><th>$/ml</th><th>Distancia de tamaño</th></tr></thead><tbody id="tbody"></tbody></table>
+</section>
+
+<section class="panel" id="aiPanel" style="display:none">
+<h2>4. Prompt listo para IA Generativa</h2>
+<p class="note">La predicción numérica se calcula de forma reproducible con los comparables; la IA interpreta el resultado, genera el racional de negocio y propone acciones. Así se separa cálculo de interpretación.</p>
+<textarea id="aiPrompt" readonly></textarea>
+<button onclick="downloadPrompt()">Descargar prompt</button>
+</section>
+</div>
+<script>
+const DATA=[{"producto": "Serum Vitamina C", "marca": "Marca A", "categoria": "Skincare", "precio": 18990, "ml": 30, "precio_ml": 633.0, "competidor_precio": 17990, "posicion_gondola": "Nivel ojos", "packaging": "Premium", "discrepancia_pct": 5.56, "alerta": "Revisar precio", "visual_score": 0.92}, {"producto": "Crema Hidratante", "marca": "Marca B", "categoria": "Skincare", "precio": 12990, "ml": 50, "precio_ml": 259.8, "competidor_precio": 13990, "posicion_gondola": "Nivel manos", "packaging": "Masivo", "discrepancia_pct": -7.15, "alerta": "Oportunidad", "visual_score": 0.87}, {"producto": "Shampoo Reparación", "marca": "Marca C", "categoria": "Haircare", "precio": 9990, "ml": 400, "precio_ml": 24.98, "competidor_precio": 8990, "posicion_gondola": "Nivel manos", "packaging": "Masivo", "discrepancia_pct": 11.12, "alerta": "Precio alto", "visual_score": 0.81}, {"producto": "Protector Solar FPS50", "marca": "Marca D", "categoria": "Solar", "precio": 24990, "ml": 200, "precio_ml": 124.95, "competidor_precio": 23990, "posicion_gondola": "Nivel ojos", "packaging": "Premium", "discrepancia_pct": 4.17, "alerta": "Monitorear", "visual_score": 0.95}, {"producto": "Agua Micelar", "marca": "Marca E", "categoria": "Limpieza", "precio": 7990, "ml": 400, "precio_ml": 19.98, "competidor_precio": 8990, "posicion_gondola": "Nivel bajo", "packaging": "Masivo", "discrepancia_pct": -11.12, "alerta": "Oportunidad", "visual_score": 0.76}, {"producto": "Contorno de Ojos", "marca": "Marca F", "categoria": "Skincare", "precio": 15990, "ml": 15, "precio_ml": 1066.0, "competidor_precio": 12990, "posicion_gondola": "Nivel ojos", "packaging": "Premium", "discrepancia_pct": 23.09, "alerta": "Precio alto", "visual_score": 0.94}];
+const cats=[...new Set(DATA.map(x=>x.categoria).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+const cat=document.getElementById("cat");
+cat.innerHTML=cats.map(c=>`<option value="${c}">${c}</option>`).join("");
+
+function median(a){a=[...a].sort((x,y)=>x-y);const n=a.length;return n%2?a[(n-1)/2]:(a[n/2-1]+a[n/2])/2}
+function money(x){return new Intl.NumberFormat("es-AR",{style:"currency",currency:"ARS",maximumFractionDigits:0}).format(x)}
+function predict(){
+ const category=cat.value, ml=Number(document.getElementById("ml").value);
+ if(!ml||ml<=0){document.getElementById("out").style.display="block";document.getElementById("explain").innerHTML='<span class="error">Ingresá una cantidad de ml mayor a 0.</span>';return}
+ const pool=DATA.filter(x=>x.categoria===category && x.ml>0 && x.precio>0);
+ if(!pool.length){document.getElementById("out").style.display="block";document.getElementById("explain").innerHTML='<span class="error">No hay datos para esa categoría.</span>';return}
+ // Modelo explicable: vecinos por tamaño de envase + mediana de precio/ml.
+ const ranked=pool.map(x=>({...x,dist:Math.abs(Math.log(ml/x.ml))})).sort((a,b)=>a.dist-b.dist);
+ const k=Math.min(5,ranked.length), neigh=ranked.slice(0,k);
+ const unit=median(neigh.map(x=>x.precio_ml));
+ const raw=unit*ml;
+ const prices=neigh.map(x=>x.precio*(ml/x.ml));
+ const low=median(prices)*0.9, high=median(prices)*1.1;
+ const pred=median(prices);
+ document.getElementById("out").style.display="block";
+ document.getElementById("pred").textContent=money(pred);
+ document.getElementById("range").textContent=`Rango orientativo: ${money(low)} — ${money(high)}`;
+ document.getElementById("explain").innerHTML=`<b>Categoría:</b> ${category}<br><b>Contenido:</b> ${ml} ml<br><b>Precio medio equivalente:</b> ${money(raw)}<br><b>Comparables:</b> ${k}<br><b>Confianza:</b> ${k>=3?"media":"baja"} — depende del tamaño y cantidad de observaciones disponibles.<br><br><b>Uso recomendado:</b> punto de partida para validación comercial, no precio definitivo.`;
+ document.getElementById("tbody").innerHTML=neigh.map(x=>`<tr><td>${x.producto}</td><td>${x.ml}</td><td>${money(x.precio)}</td><td>${money(x.precio_ml)}</td><td>${(x.dist*100).toFixed(1)}%</td></tr>`).join("");
+ document.getElementById("comparables").style.display="block";
+ const prompt=buildPrompt(category,ml,pred,low,high,neigh);
+ document.getElementById("aiPrompt").value=prompt;
+ document.getElementById("aiPanel").style.display="block";
+}
+function buildPrompt(category,ml,pred,low,high,neigh){
+ return `ROL: Actuá como analista senior de marketing y pricing para el lanzamiento de un nuevo producto en Argentina.
+
+OBJETIVO:
+Estimar y contextualizar el precio inicial de un nuevo producto usando exclusivamente evidencia del dataset consolidado. La predicción numérica ya fue calculada por un modelo reproducible basado en productos comparables de la misma categoría y tamaño.
+
+INPUT DEL NUEVO PRODUCTO:
+- categoria: ${category}
+- ml: ${ml}
+
+PREDICCIÓN BASE:
+- precio_sugerido_ars: ${Math.round(pred)}
+- rango_inferior_ars: ${Math.round(low)}
+- rango_superior_ars: ${Math.round(high)}
+
+COMPARABLES UTILIZADOS:
+${JSON.stringify(neigh.map(x=>({producto:x.producto,marca:x.marca,categoria:x.categoria,ml:x.ml,precio:x.precio,precio_ml:x.precio_ml,posicion_gondola:x.posicion_gondola,packaging:x.packaging})),null,2)}
+
+INSTRUCCIONES:
+1. No inventes datos.
+2. Explicá por qué esos comparables son relevantes.
+3. Diferenciá claramente cálculo, evidencia e inferencia.
+4. No presentes la predicción como garantía de precio de mercado.
+5. Analizá si el precio sugerido podría posicionar al producto como masivo, medio o premium SOLO si los datos lo permiten.
+6. Considerá precio por ml y tamaño del envase.
+7. Si la muestra es pequeña, indicá la limitación.
+8. Proponé 3 acciones de validación comercial antes del lanzamiento.
+9. Generá una recomendación final para marketing.
+
+SALIDA JSON OBLIGATORIA:
+{
+  "prediccion": {"precio_ars":0,"rango_ars":[0,0],"confianza":"ALTA|MEDIA|BAJA"},
+  "racional":"...",
+  "evidencia":["..."],
+  "limitaciones":["..."],
+  "acciones_validacion":["...","...","..."],
+  "decision_marketing":{"pricing":"...","posicionamiento":"...","promocion":"..."}
+}`;
+}
+function downloadPrompt(){const blob=new Blob([document.getElementById("aiPrompt").value],{type:"text/plain;charset=utf-8"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="prompt_prediccion_lanzamiento.txt";a.click()}
+</script>
+</body></html>
