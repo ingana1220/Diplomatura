@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Flujo de trabajo — Inteligencia de Precios </title>
+<style>
+:root{--g:#dff3e4;--gb:#78b88a;--gd:#285c39;--b:#e1ecf8;--bb:#6d9bc8;--bd:#244a70;--r:#e8d4d8;--rb:#8b4a56;--rd:#632b35;--bg:#f5f8f9}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Segoe UI,Arial,sans-serif;color:#24313a}
+.wrap{max-width:1120px;margin:auto;padding:28px 20px 45px}header{text-align:center;margin-bottom:22px}
+h1{margin:0 0 6px;font-size:28px}.sub{margin:0;color:#68757d;font-size:14px}
+.section{background:#fff;border-radius:18px;padding:18px 20px 22px;margin:10px 0;box-shadow:0 6px 22px #26353e12}
+.st{font-weight:800;font-size:18px;margin-bottom:16px}.dot{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:8px}
+.g .dot{background:var(--gb)}.b .dot{background:var(--bb)}.r .dot{background:var(--rb)}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}
+.card{border:2px solid;border-radius:13px;padding:14px;cursor:pointer;transition:.15s;min-height:145px}
+.card:hover{transform:translateY(-3px);box-shadow:0 8px 18px #26353e18}.card h3{font-size:14px;line-height:1.2;margin:0 0 8px}.card p,.card li{font-size:12.5px;line-height:1.4}.card ul{margin:6px 0 0;padding-left:17px}
+.gc{background:var(--g);border-color:var(--gb);color:var(--gd)}.bc{background:var(--b);border-color:var(--bb);color:var(--bd)}.rc{background:var(--r);border-color:var(--rb);color:var(--rd)}
+.arrow{text-align:center;font-size:26px;color:#9aa7ae;height:34px;line-height:34px}
+.process{display:flex;flex-direction:column;align-items:center}.wide{width:min(550px,100%);min-height:105px;text-align:center}
+.branches{width:min(800px,100%);display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.branch{min-height:160px}.outputs .card{min-height:145px}
+.legend{text-align:center;margin-top:15px;color:#68757d;font-size:12px}.legend span{margin:0 10px}
+dialog{border:0;border-radius:15px;max-width:440px;width:calc(100% - 30px);box-shadow:0 25px 70px #0004;padding:0}
+dialog::backdrop{background:#17252d55}.modal{padding:22px}.modal h2{margin:0 0 9px;font-size:20px}.modal p{color:#5d6971;line-height:1.5}.close{background:#26353e;color:white;border:0;border-radius:8px;padding:9px 14px;cursor:pointer}
+@media(max-width:850px){.cards{grid-template-columns:repeat(2,1fr)}}@media(max-width:560px){.cards,.branches{grid-template-columns:1fr}.wrap{padding:20px 12px}h1{font-size:23px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><h1>Flujo de trabajo — Inteligencia de Precios</h1><p class="sub">Datos enriquecidos → análisis visual y de pricing → IA generativa → decisiones</p></header>
+
+<section class="section g">
+<div class="st"><span class="dot"></span>ENTRADAS</div>
+<div class="cards">
+<article class="card gc" data-t="Dataset base" data-d="CSV con 250+ productos de belleza: marca, producto, precio y presentación."><h3>🟢 DATASET BASE</h3><p><b>CSV — 250+ productos</b></p><ul><li>Marca</li><li>Producto</li><li>Precio</li><li>Presentación</li></ul></article>
+<article class="card gc" data-t="Open Beauty Facts" data-d="API REST para enriquecer los productos con ingredientes, clasificación oficial e imágenes."><h3>🟢 OPEN BEAUTY FACTS</h3><p><b>API REST</b></p><ul><li>Ingredientes</li><li>Clasificación</li><li>Imágenes</li></ul></article>
+<article class="card gc" data-t="Innovatiana Cosmetics" data-d="Dataset que complementa el análisis con imágenes, packaging y características visuales de góndola."><h3>🟢 INNOVATIANA COSMETICS</h3><p><b>Dataset</b></p><ul><li>Packaging</li><li>Características visuales</li><li>Góndola</li></ul></article>
+<article class="card gc" data-t="Fotos reales de góndola" data-d="Fotografías tomadas en farmacias y supermercados: packaging, ubicación, precio visible y competidores."><h3>🟢 FOTOS REALES DE GÓNDOLA</h3><p><b>Farmacias y supermercados</b></p><ul><li>Packaging</li><li>Ubicación</li><li>Precio visible</li><li>Competidores</li></ul></article>
+</div></section>
+
+<div class="arrow">↓</div>
+
+<section class="section b">
+<div class="st"><span class="dot"></span>PROCESAMIENTO CON IA</div>
+<div class="process">
+<article class="card bc wide" data-t="Integración y normalización" data-d="Unifica las fuentes, normaliza campos y limpia los datos para construir una base consolidada."><h3>🔵 INTEGRACIÓN Y NORMALIZACIÓN</h3><p>Unificar fuentes · Normalizar campos · Limpiar datos</p></article>
+<div class="arrow">↓</div>
+<article class="card bc wide" data-t="Matching fuzzy" data-d="Identifica y vincula el mismo producto entre las distintas fuentes aunque existan diferencias en nombres o formatos."><h3>🔵 MATCHING FUZZY</h3><p>Identificar el mismo producto entre distintas fuentes.</p></article>
+<div class="arrow">↓</div>
+<div class="branches">
+<article class="card bc branch" data-t="Computer Vision" data-d="Analiza fotos reales de góndola para detectar packaging, posición, presencia de marca o competidores y precio visible."><h3>🔵 COMPUTER VISION</h3><ul><li>Detecta packaging</li><li>Posición en góndola</li><li>Presencia de marca</li><li>Competidores</li></ul></article>
+<article class="card bc branch" data-t="Análisis de pricing" data-d="Compara precio de etiqueta y precio por ml, detecta discrepancias y analiza competitividad."><h3>🔵 ANÁLISIS DE PRICING</h3><ul><li>Precio etiqueta</li><li>Precio por ml</li><li>Comparación</li><li>Discrepancias</li><li>Competitividad</li></ul></article>
+</div>
+<div class="arrow">↓</div>
+<article class="card bc wide" data-t="IA Generativa" data-d="Cruza variables, detecta patrones, interpreta resultados y genera insights accionables."><h3>🔵 IA GENERATIVA</h3><p>Detecta patrones · Cruza variables · Interpreta resultados · Genera insights accionables</p></article>
+</div></section>
+
+<div class="arrow">↓</div>
+
+<section class="section r">
+<div class="st"><span class="dot"></span>SALIDAS</div>
+<div class="cards">
+<article class="card rc" data-t="Dashboard interactivo" data-d="Visualiza KPIs, precios, competidores, packaging y posicionamiento."><h3>🟤 DASHBOARD INTERACTIVO</h3><ul><li>KPIs</li><li>Precios</li><li>Competidores</li><li>Packaging</li><li>Posicionamiento</li></ul></article>
+<article class="card rc" data-t="Documento ejecutivo de pricing" data-d="Consolida insights, hallazgos y recomendaciones para marketing."><h3>🟤 DOCUMENTO EJECUTIVO DE PRICING</h3><ul><li>Insights</li><li>Hallazgos</li><li>Recomendaciones</li></ul></article>
+<article class="card rc" data-t="Alertas automáticas" data-d="Señala discrepancias de precio, cambios relevantes y oportunidades detectadas."><h3>🟤 ALERTAS AUTOMÁTICAS</h3><ul><li>Discrepancias</li><li>Cambios de precio</li><li>Oportunidades</li></ul></article>
+<article class="card rc" data-t="Decisiones de marketing" data-d="Convierte los resultados en decisiones de pricing, posicionamiento y promociones."><h3>🟤 DECISIONES DE MARKETING</h3><ul><li>Pricing</li><li>Posicionamiento</li><li>Promociones</li></ul></article>
+</div></section>
+<div class="legend">🟢 Entrada &nbsp; · &nbsp; 🔵 Proceso con IA &nbsp; · &nbsp; 🟤 Salida &nbsp; · &nbsp; Hacé clic en un bloque para ver detalles</div>
+</div>
+
+<dialog id="dlg"><div class="modal"><h2 id="mt"></h2><p id="md"></p><button class="close" onclick="dlg.close()">Cerrar</button></div></dialog>
+<script>
+const dlg=document.getElementById('dlg'),mt=document.getElementById('mt'),md=document.getElementById('md');
+document.querySelectorAll('.card').forEach(c=>c.onclick=()=>{mt.textContent=c.dataset.t;md.textContent=c.dataset.d;dlg.showModal()});
+</script>
+</body>
+</html>
