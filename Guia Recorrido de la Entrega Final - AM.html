@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Guía de recorrido — TP Final · Pagamos por el producto o por el envase</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#f7f3e9;
+    --paper:#fffdf7;
+    --ink:#2b2a22;
+    --ink-soft:#6b6656;
+    --pine:#33452c;
+    --pine-deep:#212f1c;
+    --sage:#7c8c5e;
+    --sage-pale:#e3e6d2;
+    --moss:#5c6e42;
+    --clay:#a6733f;
+    --clay-pale:#efe0cc;
+    --line:#d9d3bf;
+    --radius:16px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    background:var(--cream);
+    background-image:
+      radial-gradient(ellipse 900px 500px at 12% -10%, #eef0dd 0%, transparent 60%),
+      radial-gradient(ellipse 700px 500px at 100% 0%, #f1e9d3 0%, transparent 55%);
+    color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif;
+    line-height:1.55;
+  }
+  .wrap{max-width:920px;margin:0 auto;padding:0 24px 80px}
+
+  /* HERO */
+  header.hero{
+    padding:64px 24px 40px;
+    max-width:920px;margin:0 auto;
+    position:relative;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--moss);
+    display:flex;align-items:center;gap:10px;margin-bottom:18px;
+  }
+  .eyebrow::before{content:"";width:26px;height:1px;background:var(--sage);display:inline-block}
+  h1{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:clamp(30px,4.4vw,46px);
+    line-height:1.08;
+    margin:0 0 14px;
+    color:var(--pine-deep);
+    letter-spacing:-0.01em;
+  }
+  h1 em{font-style:italic;font-weight:500;color:var(--clay)}
+  .sub{
+    font-size:16.5px;color:var(--ink-soft);max-width:640px;margin:0 0 26px;
+  }
+  .meta-row{
+    display:flex;flex-wrap:wrap;gap:10px;margin-bottom:30px;
+  }
+  .pill{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    background:var(--paper);
+    border:1px solid var(--line);
+    padding:7px 12px;border-radius:999px;color:var(--ink-soft);
+  }
+  .repo-card{
+    background:var(--pine-deep);
+    color:#eef1e6;
+    border-radius:var(--radius);
+    padding:22px 24px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:16px;
+    flex-wrap:wrap;
+    box-shadow:0 14px 30px -14px rgba(33,47,28,.55);
+  }
+  .repo-card .label{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:#b9c4a9;font-family:'IBM Plex Mono',monospace;margin-bottom:6px}
+  .repo-card .url{font-family:'IBM Plex Mono',monospace;font-size:14.5px;color:#fff;word-break:break-all}
+  .repo-card a.btn{
+    background:#eef1e6;color:var(--pine-deep);
+    padding:11px 18px;border-radius:10px;
+    font-weight:600;font-size:14px;
+    text-decoration:none;white-space:nowrap;
+    transition:transform .15s ease, background .15s ease;
+    flex-shrink:0;
+  }
+  .repo-card a.btn:hover{background:#fff;transform:translateY(-1px)}
+
+  /* INTRO NOTE */
+  .note{
+    margin:34px 0 6px;
+    font-size:15px;color:var(--ink-soft);
+    max-width:680px;
+  }
+  .note strong{color:var(--pine)}
+
+  /* CONTROLS */
+  .controls{
+    display:flex;gap:8px;flex-wrap:wrap;
+    margin:30px 0 6px;
+    position:sticky;top:0;z-index:20;
+    padding:14px 0;
+    background:linear-gradient(var(--cream) 70%, transparent);
+  }
+  .filter{
+    font-family:'Inter',sans-serif;
+    font-size:13px;font-weight:600;
+    border:1px solid var(--line);
+    background:var(--paper);
+    color:var(--ink-soft);
+    padding:8px 14px;border-radius:999px;
+    cursor:pointer;
+    transition:.15s ease;
+  }
+  .filter:hover{border-color:var(--sage)}
+  .filter.active{
+    background:var(--pine);
+    border-color:var(--pine);
+    color:#fff;
+  }
+  .progress-wrap{
+    margin-left:auto;
+    display:flex;align-items:center;gap:10px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;color:var(--ink-soft);
+  }
+  .progress-bar{
+    width:90px;height:6px;border-radius:99px;background:var(--sage-pale);overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;background:var(--moss);width:0%;
+    transition:width .35s ease;
+  }
+
+  /* PATH / TIMELINE */
+  .path{
+    position:relative;
+    margin-top:34px;
+    padding-left:46px;
+  }
+  .path::before{
+    content:"";
+    position:absolute;
+    left:17px;top:8px;bottom:8px;
+    width:2px;
+    background:repeating-linear-gradient(to bottom, var(--sage) 0 6px, transparent 6px 12px);
+  }
+  .stop{
+    position:relative;
+    margin-bottom:26px;
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:22px 24px 22px 26px;
+    transition:box-shadow .2s ease, transform .2s ease, border-color .2s ease;
+  }
+  .stop:hover{
+    box-shadow:0 16px 34px -20px rgba(51,69,44,.35);
+    border-color:var(--sage);
+    transform:translateY(-2px);
+  }
+  .stop.done{
+    background:var(--sage-pale);
+  }
+  .stop-num{
+    position:absolute;
+    left:-46px;top:24px;
+    width:34px;height:34px;
+    border-radius:50%;
+    background:var(--paper);
+    border:2px solid var(--sage);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Fraunces',serif;font-weight:600;font-size:14px;
+    color:var(--pine);
+    transition:.2s ease;
+  }
+  .stop.done .stop-num{
+    background:var(--moss);border-color:var(--moss);color:#fff;
+  }
+  .stop-top{
+    display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;
+    margin-bottom:10px;
+  }
+  .stop-title{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:19px;
+    color:var(--pine-deep);
+    margin:0 0 6px;
+  }
+  .filename{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:13px;
+    color:var(--clay);
+    background:var(--clay-pale);
+    padding:3px 9px;
+    border-radius:6px;
+    display:inline-block;
+    word-break:break-word;
+  }
+  .badges{display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap}
+  .badge{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;
+    padding:4px 9px;border-radius:6px;font-weight:500;
+  }
+  .badge.html{background:#e3e6d2;color:var(--moss)}
+  .badge.pdf{background:#f3ded2;color:#9a5232}
+  .badge.txt{background:#e7e2d3;color:var(--ink-soft)}
+  .desc{font-size:14.5px;color:var(--ink-soft);margin:8px 0 16px;max-width:600px}
+  .stop-bottom{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  a.view{
+    font-size:13.5px;font-weight:600;color:var(--pine);
+    text-decoration:none;
+    display:inline-flex;align-items:center;gap:6px;
+    border-bottom:1px solid var(--pine);
+    padding-bottom:1px;
+  }
+  a.view:hover{color:var(--clay);border-color:var(--clay)}
+  .mark{
+    font-family:'Inter',sans-serif;
+    font-size:12.5px;font-weight:600;
+    color:var(--ink-soft);
+    background:transparent;
+    border:1px solid var(--line);
+    padding:6px 12px;border-radius:999px;
+    cursor:pointer;
+    transition:.15s ease;
+    margin-left:auto;
+  }
+  .mark:hover{border-color:var(--sage)}
+  .stop.done .mark{background:var(--moss);color:#fff;border-color:var(--moss)}
+  .pair-tag{
+    font-size:11.5px;color:var(--sage);font-family:'IBM Plex Mono',monospace;
+    margin-bottom:6px;
+  }
+
+  footer{
+    margin-top:50px;
+    padding-top:26px;
+    border-top:1px solid var(--line);
+    font-size:13px;color:var(--ink-soft);
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;
+  }
+  footer a{color:var(--pine);text-decoration:none;border-bottom:1px solid var(--sage)}
+
+  @media(max-width:600px){
+    header.hero{padding:44px 18px 20px}
+    .wrap{padding:0 16px 60px}
+    .path{padding-left:34px}
+    .path::before{left:12px}
+    .stop-num{left:-34px;width:28px;height:28px;font-size:12px;top:22px}
+    .stop{padding:18px 16px 18px 18px}
+    .repo-card{flex-direction:column;align-items:flex-start}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="eyebrow">Diplomatura en Ciencia de Datos e IA · Entrega final</div>
+  <h1>Pagamos por el producto<br>o por <em>el envase</em></h1>
+  <p class="sub">Guía de recorrido para la corrección del trabajo práctico — un mapa breve de los archivos de respaldo, con el orden sugerido de lectura y acceso directo a cada uno en el repositorio.</p>
+  <div class="meta-row">
+    <span class="pill">Ana Motnagna</span>
+    <span class="pill">Agosto 2026</span>
+    <span class="pill">Inteligencia de Precios · Skincare</span>
+    <span class="pill">8 documentos de respaldo</span>
+  </div>
+  <div class="repo-card">
+    <div>
+      <div class="label">Repositorio completo</div>
+      <div class="url">github.com/ingana1220/Diplomatura</div>
+    </div>
+    <a class="btn" href="https://github.com/ingana1220/Diplomatura" target="_blank" rel="noopener">Abrir repositorio ↗</a>
+  </div>
+  <p class="note">Los ocho documentos listados abajo son el respaldo directo de la entrega. Cada tarjeta indica el <strong>nombre exacto del archivo </strong> con acceso directo. El orden numerado es el recorrido sugerido: parte de la presentación general, sigue por el flujo de trabajo y sus prototipos, y cierra con el detalle técnico del proceso.</p>
+</header>
+
+<div class="wrap">
+
+  <div class="controls">
+    <button class="filter active" data-f="all">Todos</button>
+    <button class="filter" data-f="html">Interactivos (.html)</button>
+    <button class="filter" data-f="pdf">Documentos (.pdf)</button>
+    <button class="filter" data-f="txt">Lecturas (.txt)</button>
+    <div class="progress-wrap">
+      <span id="progressLabel">0 / 8 revisados</span>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+  </div>
+
+  <div class="path" id="path">
+
+    <article class="stop" data-type="html">
+      <div class="stop-num">1</div>
+      <div class="stop-top">
+        <div>
+          <div class="stop-title">Presentación ejecutiva</div>
+          <span class="filename">Presentación Ejecutiva NOL TP Entrega 2 AM.html</span>
+        </div>
+        <div class="badges"><span class="badge html">HTML</span></div>
+      </div>
+      <p class="desc">Presentación breve del contexto, el objetivo del trabajo, a quiénes afecta el problema de pricing, y las métricas y KPI de éxito propuestos. Punto de partida recomendado para tener el panorama general antes de entrar en el detalle técnico.</p>
+      <div class="stop-bottom">
+        <a class="view" href="https://github.com/ingana1220/Diplomatura/blob/main/Presentaci%C3%B3n%20Ejecutiva%20NOL%20TP%20Entrega%202%20AM.html" target="_blank" rel="noopener">Ver archivo ↗</a>
+        <button class="mark" onclick="toggleDone(this)">Marcar como revisado</button>
+      </div>
+    </article>
+
+    <article class="stop" data-type="html">
+      <div class="stop-num">2</div>
+      <div class="stop-top">
+        <div>
+          <div class="stop-title">Flujo de trabajo — esquema interactivo</div>
+          <span class="filename">Flujo_de_trabajo_Pricing_IA_interactivo.html</span>
+        </div>
+        <div class="badges"><span class="badge html">HTML</span></div>
+      </div>
+      <p class="desc">Esquema clickeable del flujo de entrada, procesamiento y salida del modelo: entradas de datos, procesamiento con IA (Computer Vision + análisis de pricing + IA Generativa) y las salidas de negocio. Cada bloque se puede tocar para ver su detalle.</p>
+      <div class="stop-bottom">
+        <a class="view" href="https://github.com/ingana1220/Diplomatura/blob/main/Flujo_de_trabajo_Pricing_IA_interactivo.html" target="_blank" rel="noopener">Ver archivo ↗</a>
+        <button class="mark" onclick="toggleDone(this)">Marcar como revisado</button>
+      </div>
+    </article>
+
+    <article class="stop" data-type="pdf">
+      <div class="stop-num">3</div>
+      <div class="stop-top">
+        <div>
+          <div class="stop-title">Detalle del flujo de trabajo</div>
+          <span class="filename">Detalle flujo de trabajo.pdf</span>
+        </div>
+        <div class="badges"><span class="badge pdf">PDF</span></div>
+      </div>
+      <p class="desc">Amplía el esquema anterior: describe con mayor profundidad las etapas del flujo de procesamiento, las fuentes de datos utilizadas, el modelo aplicado y los entregables generados en cada etapa.</p>
+      <div class="stop-bottom">
+        <a class="view" href="https://github.com/ingana1220/Diplomatura/blob/main/Detalle%20flujo%20de%20trabajo.pdf" target="_blank" rel="noopener">Ver archivo ↗</a>
+        <button class="mark" onclick="toggleDone(this)">Marcar como revisado</button>
+      </div>
+    </article>
+
+    <article class="stop" data-type="html">
+      <div class="stop-num">4</div>
+      <div class="stop-top">
+        <div>
+          <div class="stop-title">Dashboard ejecutivo — prototipo</div>
+          <span class="filename">dashboard_prototipo V1.html</span>
+        </div>
+        <div class="badges"><span class="badge html">HTML</span></div>
+      </div>
+      <p class="desc">Dashboard ejecutivo con KPIs, tabla de pricing por producto e insights generados, pensado para la toma de decisiones del área de marketing.</p>
+      <div class="stop-bottom">
+        <a class="view" href="https://github.com/ingana1220/Diplomatura/blob/main/dashboard_prototipo%20V1.html" target="_blank" rel="noopener">Ver archivo ↗</a>
+        <button class="mark" onclick="toggleDone(this)">Marcar como revisado</button>
+      </div>
+    </article>
+
+    <article class="stop" data-type="txt">
+      <div class="stop-num">5</div>
+      <div class="stop-top">
+        <div>
+          <div class="stop-title">Léame del dashboard</div>
+          <span class="filename">README dashboard.txt</span>
+        </div>
+        <div class="badges"><span class="badge txt">TXT</span></div>
+      </div>
+      <p class="pair-tag">↳ acompaña al archivo anterior</p>
+      <p class="desc">Aclara el contenido de la página HTML del dashboard: qué archivos la componen y cómo abrirla.</p>
+      <div class="stop-bottom">
+        <a class="view" href="https://github.com/ingana1220/Diplomatura/blob/main/README%20dashboard.txt" target="_blank" rel="noopener">Ver archivo ↗</a>
+        <button class="mark" onclick="toggleDone(this)">Marcar como revisado</button>
+      </div>
+    </article>
+
+    <article class="stop" data-type="html">
+      <div class="stop-num">6</div>
+      <div class="stop-top">
+        <div>
+          <div class="stop-title">Lanzamiento de producto — predicción de precio</div>
+          <span class="filename">lanzamiento_precio.html</span>
+        </div>
+        <div class="badges"><span class="badge html">HTML</span></div>
+      </div>
+      <p class="desc">Prototipo interactivo para estimar el precio de lanzamiento de un producto nuevo en base a categorías y tamaños de envase similares del dataset consolidado, con nivel de confianza y prompt de IA Generativa asociado.</p>
+      <div class="stop-bottom">
+        <a class="view" href="https://github.com/ingana1220/Diplomatura/blob/main/Prototipo%20v2/lanzamiento_precio.html" target="_blank" rel="noopener">Ver archivo ↗</a>
+        <button class="mark" onclick="toggleDone(this)">Marcar como revisado</button>
+      </div>
+    </article>
+
+    <article class="stop" data-type="txt">
+      <div class="stop-num">7</div>
+      <div class="stop-top">
+        <div>
+          <div class="stop-title">Léame del prototipo de lanzamiento</div>
+          <span class="filename">README.txt</span>
+        </div>
+        <div class="badges"><span class="badge txt">TXT</span></div>
+      </div>
+      <p class="pair-tag">↳ acompaña al archivo anterior</p>
+      <p class="desc">Aclara el contenido de la página HTML de lanzamiento de precio: qué devuelve el prototipo y qué archivos lo componen.</p>
+      <div class="stop-bottom">
+        <a class="view" href="https://github.com/ingana1220/Diplomatura/blob/main/Prototipo%20v2/README.txt" target="_blank" rel="noopener">Ver archivo ↗</a>
+        <button class="mark" onclick="toggleDone(this)">Marcar como revisado</button>
+      </div>
+    </article>
+
+    <article class="stop" data-type="pdf">
+      <div class="stop-num">8</div>
+      <div class="stop-top">
+        <div>
+          <div class="stop-title">Descripción del proceso de creación</div>
+          <span class="filename">TP Entrega 2 - Descripcion proceso -  AM.pdf</span>
+        </div>
+        <div class="badges"><span class="badge pdf">PDF</span></div>
+      </div>
+      <p class="desc">Documento más extenso: describe el proceso de creación del trabajo práctico, con capturas de pantalla del modelo de Computer Vision y el prompt completo de IA Generativa. Recomendado como cierre del recorrido, a modo de anexo técnico.</p>
+      <div class="stop-bottom">
+        <a class="view" href="https://github.com/ingana1220/Diplomatura/blob/main/TP%20Entrega%202%20-%20Descripcion%20proceso%20-%20%20AM.pdf" target="_blank" rel="noopener">Ver archivo ↗</a>
+        <button class="mark" onclick="toggleDone(this)">Marcar como revisado</button>
+      </div>
+    </article>
+
+  </div>
+
+  <footer>
+    <span>Los datos utilizados en los prototipos son sintéticos y sirven únicamente para demostrar el funcionamiento del flujo.</span>
+    <a href="https://github.com/ingana1220/Diplomatura" target="_blank" rel="noopener">Ver repositorio completo ↗</a>
+  </footer>
+
+</div>
+
+<script>
+  const filters = document.querySelectorAll('.filter');
+  const stops = document.querySelectorAll('.stop');
+  filters.forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      filters.forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      const f = btn.dataset.f;
+      stops.forEach(s=>{
+        s.style.display = (f==='all' || s.dataset.type===f) ? '' : 'none';
+      });
+    });
+  });
+
+  function updateProgress(){
+    const total = stops.length;
+    const done = document.querySelectorAll('.stop.done').length;
+    document.getElementById('progressLabel').textContent = done + ' / ' + total + ' revisados';
+    document.getElementById('progressFill').style.width = (done/total*100) + '%';
+  }
+  function toggleDone(btn){
+    const stop = btn.closest('.stop');
+    stop.classList.toggle('done');
+    btn.textContent = stop.classList.contains('done') ? 'Revisado ✓' : 'Marcar como revisado';
+    updateProgress();
+  }
+  updateProgress();
+</script>
+
+</body>
+</html>
