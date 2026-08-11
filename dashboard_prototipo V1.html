@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Inteligencia de Precio — Prototipo</title>
+<style>
+body{font-family:Arial,sans-serif;margin:0;background:#f5f7f8;color:#24313a}.wrap{max-width:1180px;margin:auto;padding:28px}
+h1{margin:0}.sub{color:#68757d}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:24px 0}.kpi{background:#fff;border-radius:14px;padding:18px;box-shadow:0 4px 18px #0000000d}.kpi b{font-size:20px}.panel{background:#fff;border-radius:14px;padding:20px;margin:16px 0;box-shadow:0 4px 18px #0000000d}
+table{width:100%;border-collapse:collapse}th,td{padding:10px;border-bottom:1px solid #e4e8ea;text-align:left;font-size:13px}th{background:#eef3f5}
+.badge{padding:5px 8px;border-radius:8px;background:#f0dfe2;color:#632b35}.ok{background:#dff3e4;color:#285c39}
+.bar{height:14px;background:#dfe9f2;border-radius:8px;overflow:hidden}.fill{height:100%;background:#6d9bc8}
+button{border:0;border-radius:9px;padding:10px 14px;background:#26353e;color:#fff;cursor:pointer;margin-right:8px}
+textarea{width:100%;min-height:210px;border:1px solid #d6dde1;border-radius:10px;padding:12px;font-family:monospace}
+@media(max-width:800px){.grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:520px){.grid{grid-template-columns:1fr}}
+</style></head>
+<body><div class="wrap">
+<h1>Inteligencia de Precios </h1><p class="sub">Prototipo integral · datos estructurados + Computer Vision + IA Generativa</p>
+<div class="grid" id="kpis"></div>
+<div class="panel"><h2>Productos y pricing</h2><table><thead><tr><th>Producto</th><th>Marca</th><th>Precio</th><th>$/ml</th><th>Competidor</th><th>Posición</th><th>Alerta</th></tr></thead><tbody id="rows"></tbody></table></div>
+<div class="panel"><h2>Insights generados</h2><div id="insights"></div></div>
+<div class="panel"><h2>Documento ejecutivo</h2><div id="report"></div><button onclick="downloadReport()">Descargar informe .txt</button></div>
+<div class="panel"><h2>Prompt de IA Generativa</h2><textarea readonly id="prompt"></textarea></div>
+</div>
+<script>
+const data=[{"producto": "Serum Vitamina C", "marca": "Marca A", "categoria": "Skincare", "precio": 18990, "ml": 30, "precio_ml": 633.0, "competidor_precio": 17990, "posicion_gondola": "Nivel ojos", "packaging": "Premium", "discrepancia_pct": 5.56, "alerta": "Revisar precio", "visual_score": 0.92}, {"producto": "Crema Hidratante", "marca": "Marca B", "categoria": "Skincare", "precio": 12990, "ml": 50, "precio_ml": 259.8, "competidor_precio": 13990, "posicion_gondola": "Nivel manos", "packaging": "Masivo", "discrepancia_pct": -7.15, "alerta": "Oportunidad", "visual_score": 0.87}, {"producto": "Shampoo Reparación", "marca": "Marca C", "categoria": "Haircare", "precio": 9990, "ml": 400, "precio_ml": 24.98, "competidor_precio": 8990, "posicion_gondola": "Nivel manos", "packaging": "Masivo", "discrepancia_pct": 11.12, "alerta": "Precio alto", "visual_score": 0.81}, {"producto": "Protector Solar FPS50", "marca": "Marca D", "categoria": "Solar", "precio": 24990, "ml": 200, "precio_ml": 124.95, "competidor_precio": 23990, "posicion_gondola": "Nivel ojos", "packaging": "Premium", "discrepancia_pct": 4.17, "alerta": "Monitorear", "visual_score": 0.95}, {"producto": "Agua Micelar", "marca": "Marca E", "categoria": "Limpieza", "precio": 7990, "ml": 400, "precio_ml": 19.98, "competidor_precio": 8990, "posicion_gondola": "Nivel bajo", "packaging": "Masivo", "discrepancia_pct": -11.12, "alerta": "Oportunidad", "visual_score": 0.76}, {"producto": "Contorno de Ojos", "marca": "Marca F", "categoria": "Skincare", "precio": 15990, "ml": 15, "precio_ml": 1066.0, "competidor_precio": 12990, "posicion_gondola": "Nivel ojos", "packaging": "Premium", "discrepancia_pct": 23.09, "alerta": "Precio alto", "visual_score": 0.94}];
+const avg=data.reduce((a,x)=>a+x.precio_ml,0)/data.length;
+const high=data.filter(x=>x.alerta==="Precio alto").length;
+const opp=data.filter(x=>x.alerta==="Oportunidad").length;
+document.getElementById("kpis").innerHTML=[
+["Productos analizados",data.length],["Precio medio / ml","$"+avg.toFixed(2)],
+["Alertas de precio",high],["Oportunidades",opp]
+].map(x=>`<div class="kpi"><small>${x[0]}</small><br><b>${x[1]}</b></div>`).join("");
+document.getElementById("rows").innerHTML=data.map(x=>`<tr><td>${x.producto}</td><td>${x.marca}</td><td>$${x.precio.toLocaleString("es-AR")}</td><td>$${x.precio_ml.toFixed(2)}</td><td>$${x.competidor_precio.toLocaleString("es-AR")}</td><td>${x.posicion_gondola}</td><td><span class="badge ${x.alerta==="Oportunidad"?"ok":""}">${x.alerta}</span></td></tr>`).join("");
+const insights=[
+"Los productos Premium ubicados a nivel de ojos presentan alta visibilidad y justifican monitoreo de precio.",
+"El Contorno de Ojos muestra la mayor prima frente al competidor (+23,09%): requiere revisión prioritaria.",
+"Agua Micelar y Crema Hidratante presentan oportunidades relativas de precio frente al benchmark competitivo.",
+"El precio por ml permite detectar diferencias que no son evidentes al comparar únicamente el precio de etiqueta."
+];
+document.getElementById("insights").innerHTML=insights.map(x=>`<p>• ${x}</p>`).join("");
+const report=`RESUMEN EJECUTIVO — INTELIGENCIA DE PRECIO   .Se analizaron ${data.length} productos del dataset demostrativo. El flujo integra pricing, información de producto y variables visuales de góndola.  
+
+HALLAZGOS- Se detectaron ${high} casos prioritarios por precio superior al benchmark. Se identificaron ${opp} oportunidades de precio.  El análisis por ml mejora la comparabilidad entre presentaciones.
+
+RECOMENDACIONES: 1. Revisar primero los productos con mayor prima competitiva.
+2. Mantener monitoreo de productos Premium ubicados a nivel de ojos.
+3. Incorporar nuevas fotos de góndola para actualizar el análisis.`;
+document.getElementById("report").innerHTML="<pre style='white-space:pre-wrap;font-family:Arial'>"+report+"</pre>";
+const prompt=`ROL: Actuá como analista senior de pricing y trade marketing de productos de belleza.
+
+OBJETIVO: analizar datos consolidados de productos, pricing y observaciones de góndola y convertirlos en insights accionables.
+
+REGLAS:
+1. No inventes datos.
+2. Priorizá discrepancias entre precio de etiqueta y precio por ml.
+3. Compará contra el benchmark competitivo cuando exista.
+4. Usá las variables visuales (packaging, posición, presencia de marca) como contexto, no como causalidad demostrada.
+5. Clasificá cada hallazgo como: OPORTUNIDAD, ALERTA o MONITOREO.
+6. Para cada alerta indicá producto, evidencia, impacto potencial y acción recomendada.
+7. Separá hechos observados de inferencias.
+8. Entregá JSON válido con: resumen, hallazgos[], alertas[], recomendaciones[], decisiones_marketing[].
+
+DATOS:
+{{JSON_DE_DATOS_CONSOLIDADOS}}`;
+document.getElementById("prompt").value=prompt;
+function downloadReport(){const blob=new Blob([report],{type:"text/plain;charset=utf-8"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="documento_ejecutivo_pricing.txt";a.click();}
+</script></body></html>
